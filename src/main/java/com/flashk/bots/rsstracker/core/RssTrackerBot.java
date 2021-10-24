@@ -19,9 +19,11 @@ import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageReplyMarkup;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup.InlineKeyboardMarkupBuilder;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
@@ -103,6 +105,9 @@ public class RssTrackerBot extends AbilityBot {
 			
 		}
 		
+		// Parameters: (action,id)
+		// Returns: <T extends Serializable, Method extends BotApiMethod<T>> -> Method
+		
 		// TODO do something with callbackQuery.getData()
 		// String data = callbackQuery.getData();
 		// TODO validate data value to be a valid value
@@ -114,11 +119,27 @@ public class RssTrackerBot extends AbilityBot {
 		Optional<Feed> feed = feedService.getFeed("61746f2c9095ec51f15994e3");
 		
 
-		// Reply final message
-		EditMessageReplyMarkup editMessage = prepareGetFeedResponse(callbackQuery, feed);
+		// Reply final message - View RSS feed
+		
+		// Update the text message to display the RSS feed title
+		EditMessageText editMessageText = EditMessageText.builder()
+				.chatId(String.valueOf(callbackQuery.getMessage().getChatId()))
+				.messageId(callbackQuery.getMessage().getMessageId())
+				.text(feed.get().getTitle())
+				.build();
+		
+		execute(callbackQuery.getMessage().getChatId(), editMessageText);
+		
+		// Update the reply markup keyboard to show the RSS feed options
+		EditMessageReplyMarkup editMessage = EditMessageReplyMarkup.builder()
+				.messageId(callbackQuery.getMessage().getMessageId())
+				.chatId(String.valueOf(callbackQuery.getMessage().getChatId()))
+				.replyMarkup(createRssFeedItemReplyMarkup(feed.get()))
+				.build();
+				
 		execute(callbackQuery.getMessage().getChatId(), editMessage);
 	
-		// Reply final message
+
 		System.out.println(callbackQuery);
 	}
 
@@ -174,83 +195,67 @@ public class RssTrackerBot extends AbilityBot {
 		return message;
 	}
 	
-
-	/**
-	 * Feed item submenu building method.
-	 * @param callbackQuery The callback query to reply.
-	 * @param feed The feed data.
-	 * @return An EditMessageReplyMarkup object.
-	 */
-	private EditMessageReplyMarkup prepareGetFeedResponse(CallbackQuery callbackQuery, Optional<Feed> feed) {
-		
-		EditMessageReplyMarkup editMessage = new EditMessageReplyMarkup();
-		editMessage.setMessageId(callbackQuery.getMessage().getMessageId());
-		
-		editMessage.setChatId(String.valueOf(callbackQuery.getMessage().getChatId()));
-		editMessage.setReplyMarkup(createRssFeedItemReplyMarkup(feed.get()));
-		
-		return editMessage;
-	}
-	
 	private InlineKeyboardMarkup createRssFeedListReplyMarkup(List<Feed> feeds) {
 		
 		// Pre: feeds is not empty
+		
+		InlineKeyboardMarkupBuilder markupInlineBuilder = InlineKeyboardMarkup.builder();
 		
 		List<List<InlineKeyboardButton>> feedRows = new ArrayList<>();
 		
 		for(Feed feed : feeds) {
 			
-			InlineKeyboardButton feedButton = new InlineKeyboardButton();
-			feedButton.setText(feed.getTitle());
-			feedButton.setCallbackData("show/"+feed.getId());
+			InlineKeyboardButton feedButton = InlineKeyboardButton.builder()
+					.text(feed.getTitle())
+					.callbackData("show/"+feed.getId())
+					.build();
 			
+			// Add the button to a new row
 			List<InlineKeyboardButton> feedRow = new ArrayList<>();
 			feedRow.add(feedButton);
-			
 			feedRows.add(feedRow);
 			
+			markupInlineBuilder.keyboardRow(feedRow);
 		}
 		
-		InlineKeyboardMarkup markupInline = new InlineKeyboardMarkup();
-		markupInline.setKeyboard(feedRows);
 		
-		return markupInline;
+		return markupInlineBuilder.build();
 	}
 	
 	private InlineKeyboardMarkup createRssFeedItemReplyMarkup(Feed feed) {
 		
-		List<List<InlineKeyboardButton>> optionRows = new ArrayList<>();
+		InlineKeyboardMarkupBuilder markupInlineBuilder = InlineKeyboardMarkup.builder();
 
 		List<InlineKeyboardButton> row = new ArrayList<>();
 		
 		// View URL button
-		InlineKeyboardButton keyboardButton = new InlineKeyboardButton();
-		keyboardButton.setText("View RSS feed");
-		keyboardButton.setUrl(feed.getUrl());
+		InlineKeyboardButton keyboardButton = InlineKeyboardButton.builder()
+				.text("View RSS feed")
+				.url(feed.getUrl())
+				.build();
 		
 		row.add(keyboardButton);
 		
 		// Delete button
-		keyboardButton = new InlineKeyboardButton();
-		keyboardButton.setText("Delete RSS feed");
-		keyboardButton.setCallbackData("delete/"+feed.getId());
+		keyboardButton = InlineKeyboardButton.builder()
+				.text("Delete RSS feed")
+				.callbackData("delete/"+feed.getId())
+				.build();
 		
 		row.add(keyboardButton);
-		optionRows.add(row);
+		markupInlineBuilder.keyboardRow(row);
 		
 		// Back to main menu
 		row = new ArrayList<>();
-		keyboardButton = new InlineKeyboardButton();
-		keyboardButton.setText("<< Return to feed list");
-		keyboardButton.setCallbackData("show_all/");
+		keyboardButton = InlineKeyboardButton.builder()
+				.text("<< Return to feed list")
+				.callbackData("show_all/")
+				.build();
 		
 		row.add(keyboardButton);
-		optionRows.add(row);
-
-		InlineKeyboardMarkup markupInline = new InlineKeyboardMarkup();
-		markupInline.setKeyboard(optionRows);
+		markupInlineBuilder.keyboardRow(row);
 		
-		return markupInline;
+		return markupInlineBuilder.build();
 	}
 
 }
