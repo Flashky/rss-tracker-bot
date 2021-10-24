@@ -1,7 +1,9 @@
 package com.flashk.bots.rsstracker.core;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -14,6 +16,7 @@ import org.telegram.abilitybots.api.objects.Locality;
 import org.telegram.abilitybots.api.objects.MessageContext;
 import org.telegram.abilitybots.api.objects.Privacy;
 import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
+import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageReplyMarkup;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
@@ -72,7 +75,7 @@ public class RssTrackerBot extends AbilityBot {
 		// Prepare and send response
 		SendMessage message = prepareShowRssFeedsResponse(ctx, feeds);
 		
-		execute(ctx, message);
+		execute(ctx.chatId(), message);
 				
 	}
 	
@@ -108,40 +111,26 @@ public class RssTrackerBot extends AbilityBot {
 		// Reply Answercallback query
 		answerCallbackQuery(callbackQuery);
 		
-		try {
+		Optional<Feed> feed = feedService.getFeed("61746f2c9095ec51f15994e3");
+		
+
 		// Reply final message
-		EditMessageReplyMarkup editMessage = new EditMessageReplyMarkup();
-		editMessage.setMessageId(callbackQuery.getMessage().getMessageId());
-		
-		editMessage.setChatId(String.valueOf(callbackQuery.getMessage().getChatId()));
-		editMessage.setReplyMarkup(createRssFeedItemReplyMarkup("id"));
-		
-		
-		
-			this.execute(editMessage);
-		} catch (TelegramApiException e) {
-			e.printStackTrace();
-			silent.send("Oops! something wrong happened!",  callbackQuery.getMessage().getChatId());
-		}
+		EditMessageReplyMarkup editMessage = prepareGetFeedResponse(callbackQuery, feed);
+		execute(callbackQuery.getMessage().getChatId(), editMessage);
+	
 		// Reply final message
 		System.out.println(callbackQuery);
 	}
 
 	private void answerCallbackQuery(CallbackQuery callbackQuery) {
 		
-		try {
-			
-			// Prepare answer callback query
-			AnswerCallbackQuery answerCallbackQuery = new AnswerCallbackQuery();
-			answerCallbackQuery.setCallbackQueryId(callbackQuery.getId());
-			
-			// Send answer to Telegram API
-			this.execute(answerCallbackQuery);
-			
-		} catch (TelegramApiException e) {
-			e.printStackTrace();
-			silent.send("Oops! something wrong happened!", callbackQuery.getMessage().getChatId());
-		}
+		// Prepare answer callback query
+		AnswerCallbackQuery answerCallbackQuery = new AnswerCallbackQuery();
+		answerCallbackQuery.setCallbackQueryId(callbackQuery.getId());
+		
+		// Send answer to Telegram API
+		execute(callbackQuery.getMessage().getChatId(), answerCallbackQuery);
+
 	}
 
 	@Override
@@ -157,18 +146,18 @@ public class RssTrackerBot extends AbilityBot {
 	@Override
 	public long creatorId() {
 		// TODO Auto-generated method stub
-		return 0;
+		return 0; 
 	}
 	
-	private void execute(MessageContext ctx, SendMessage message) {
+	private <T extends Serializable, Method extends BotApiMethod<T>> void execute(Long chatId, Method method) {
 		try {
-			this.execute(message);
+			this.execute(method);
 		} catch (TelegramApiException e) {
 			e.printStackTrace();
-			silent.send("Oops! something wrong happened!", ctx.chatId());
+			silent.send("Oops! something wrong happened!", chatId);
 		}
 	}
-	
+
 	private SendMessage prepareShowRssFeedsResponse(MessageContext ctx, List<Feed> feeds) {
 		
 		SendMessage message = new SendMessage();
@@ -183,7 +172,25 @@ public class RssTrackerBot extends AbilityBot {
 		}
 
 		return message;
-	}	
+	}
+	
+
+	/**
+	 * Feed item submenu building method.
+	 * @param callbackQuery The callback query to reply.
+	 * @param feed The feed data.
+	 * @return An EditMessageReplyMarkup object.
+	 */
+	private EditMessageReplyMarkup prepareGetFeedResponse(CallbackQuery callbackQuery, Optional<Feed> feed) {
+		
+		EditMessageReplyMarkup editMessage = new EditMessageReplyMarkup();
+		editMessage.setMessageId(callbackQuery.getMessage().getMessageId());
+		
+		editMessage.setChatId(String.valueOf(callbackQuery.getMessage().getChatId()));
+		editMessage.setReplyMarkup(createRssFeedItemReplyMarkup(feed.get()));
+		
+		return editMessage;
+	}
 	
 	private InlineKeyboardMarkup createRssFeedListReplyMarkup(List<Feed> feeds) {
 		
@@ -209,27 +216,40 @@ public class RssTrackerBot extends AbilityBot {
 		
 		return markupInline;
 	}
-	private InlineKeyboardMarkup createRssFeedItemReplyMarkup(String rssFeedId) {
-		List<List<InlineKeyboardButton>> rowsInline = new ArrayList<>();
-		List<InlineKeyboardButton> firstRowInline = new ArrayList<>();
-		List<InlineKeyboardButton> secondRowInline = new ArrayList<>();
-
-		//add your buttons to both rows
-		InlineKeyboardButton keyboardButton = new InlineKeyboardButton();
-		keyboardButton.setText("Delete");
-		keyboardButton.setCallbackData("delete/"+rssFeedId);
-		firstRowInline.add(keyboardButton);
+	
+	private InlineKeyboardMarkup createRssFeedItemReplyMarkup(Feed feed) {
 		
-		keyboardButton = new InlineKeyboardButton();
-		keyboardButton.setText("Return");
-		keyboardButton.setCallbackData("show_all/"+rssFeedId);
-		secondRowInline.add(keyboardButton);
+		List<List<InlineKeyboardButton>> optionRows = new ArrayList<>();
 
-		rowsInline.add(firstRowInline);
-		rowsInline.add(secondRowInline);
+		List<InlineKeyboardButton> row = new ArrayList<>();
+		
+		// View URL button
+		InlineKeyboardButton keyboardButton = new InlineKeyboardButton();
+		keyboardButton.setText("View RSS feed");
+		keyboardButton.setUrl(feed.getUrl());
+		
+		row.add(keyboardButton);
+		
+		// Delete button
+		keyboardButton = new InlineKeyboardButton();
+		keyboardButton.setText("Delete RSS feed");
+		keyboardButton.setCallbackData("delete/"+feed.getId());
+		
+		row.add(keyboardButton);
+		optionRows.add(row);
+		
+		// Back to main menu
+		row = new ArrayList<>();
+		keyboardButton = new InlineKeyboardButton();
+		keyboardButton.setText("<< Return to feed list");
+		keyboardButton.setCallbackData("show_all/");
+		
+		row.add(keyboardButton);
+		optionRows.add(row);
 
 		InlineKeyboardMarkup markupInline = new InlineKeyboardMarkup();
-		markupInline.setKeyboard(rowsInline);
+		markupInline.setKeyboard(optionRows);
+		
 		return markupInline;
 	}
 
