@@ -23,12 +23,17 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKe
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import com.flashk.bots.rsstracker.config.properties.BotConfig;
+import com.flashk.bots.rsstracker.core.services.FeedService;
+import com.flashk.bots.rsstracker.core.services.model.Feed;
 
 @Service
 public class RssTrackerBot extends AbilityBot {
 
 	@Autowired
 	private BotConfig config;
+
+	@Autowired
+	private FeedService feedService;
 	
 	protected RssTrackerBot(@Value("${bot.token}")String botToken, @Value("${bot.username}") String botUsername) {
 		super(botToken, botUsername);	
@@ -61,23 +66,15 @@ public class RssTrackerBot extends AbilityBot {
 	
 	private void showRssFeeds(MessageContext ctx) {
 		
-		// TODO Call service and retrieve feeds
+		// Obtain feeds
+		List<Feed> feeds = feedService.listFeeds();
 		
-		System.out.println("Show the feeds!");
-		
-		SendMessage message = new SendMessage();
-		message.setChatId(String.valueOf(ctx.chatId()));
-		message.setText("Show the feeds!");
-		
-		
-		InlineKeyboardMarkup markupInline = createRssFeedListReplyMarkup();
-		message.setReplyMarkup(markupInline);
+		// Prepare and send response
+		SendMessage message = prepareShowRssFeedsResponse(ctx, feeds);
 		
 		execute(ctx, message);
 				
 	}
-
-
 	
 	private void handle(CallbackQuery callbackQuery) {
 		
@@ -115,6 +112,7 @@ public class RssTrackerBot extends AbilityBot {
 		// Reply final message
 		EditMessageReplyMarkup editMessage = new EditMessageReplyMarkup();
 		editMessage.setMessageId(callbackQuery.getMessage().getMessageId());
+		
 		editMessage.setChatId(String.valueOf(callbackQuery.getMessage().getChatId()));
 		editMessage.setReplyMarkup(createRssFeedItemReplyMarkup("id"));
 		
@@ -171,31 +169,46 @@ public class RssTrackerBot extends AbilityBot {
 		}
 	}
 	
-	/* TEMPORAL MOCKS */
-	private InlineKeyboardMarkup createRssFeedListReplyMarkup() {
-		List<List<InlineKeyboardButton>> rowsInline = new ArrayList<>();
-		List<InlineKeyboardButton> firstRowInline = new ArrayList<>();
-		List<InlineKeyboardButton> secondRowInline = new ArrayList<>();
-
-		//add your buttons to both rows
-		InlineKeyboardButton keyboardButton = new InlineKeyboardButton();
-		keyboardButton.setText("HD-Olimpo: Notification - Invasión");
-		keyboardButton.setCallbackData("show/61746f2c9095ec51f15994e3");
-		firstRowInline.add(keyboardButton);
+	private SendMessage prepareShowRssFeedsResponse(MessageContext ctx, List<Feed> feeds) {
 		
-		keyboardButton = new InlineKeyboardButton();
-		keyboardButton.setText("Fundación");
-		keyboardButton.setCallbackData("show_list");
-		secondRowInline.add(keyboardButton);
+		SendMessage message = new SendMessage();
+		message.setChatId(String.valueOf(ctx.chatId()));
+		
+		if(feeds.isEmpty()) {
+			message.setText("You don't have any feeds.");
+		} else {
+			message.setText("Your RSS feeds:");
+			InlineKeyboardMarkup rssFeedListReplyMarkup = createRssFeedListReplyMarkup(feeds);
+			message.setReplyMarkup(rssFeedListReplyMarkup);
+		}
 
-		rowsInline.add(firstRowInline);
-		rowsInline.add(secondRowInline);
-
+		return message;
+	}	
+	
+	private InlineKeyboardMarkup createRssFeedListReplyMarkup(List<Feed> feeds) {
+		
+		// Pre: feeds is not empty
+		
+		List<List<InlineKeyboardButton>> feedRows = new ArrayList<>();
+		
+		for(Feed feed : feeds) {
+			
+			InlineKeyboardButton feedButton = new InlineKeyboardButton();
+			feedButton.setText(feed.getTitle());
+			feedButton.setCallbackData("show/"+feed.getId());
+			
+			List<InlineKeyboardButton> feedRow = new ArrayList<>();
+			feedRow.add(feedButton);
+			
+			feedRows.add(feedRow);
+			
+		}
+		
 		InlineKeyboardMarkup markupInline = new InlineKeyboardMarkup();
-		markupInline.setKeyboard(rowsInline);
+		markupInline.setKeyboard(feedRows);
+		
 		return markupInline;
 	}
-	
 	private InlineKeyboardMarkup createRssFeedItemReplyMarkup(String rssFeedId) {
 		List<List<InlineKeyboardButton>> rowsInline = new ArrayList<>();
 		List<InlineKeyboardButton> firstRowInline = new ArrayList<>();

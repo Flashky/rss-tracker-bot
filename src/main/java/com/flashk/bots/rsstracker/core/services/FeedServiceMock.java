@@ -17,9 +17,6 @@ public class FeedServiceMock implements FeedService {
 	
 	public FeedServiceMock() {
 		
-		Map<String, Feed> feeds = new HashMap<>();
-		
-
 		Feed feed = new Feed();
 		feed.setId("61746f2c9095ec51f15994e3");
 		feed.setUrl("https://hd-olimpo.club/rss/1631.4ff22951d0562feb3b966d7e74172c44");
