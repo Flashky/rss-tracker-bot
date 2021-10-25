@@ -15,6 +15,15 @@ public abstract class AbilityCallbackBot extends AbilityBot {
 		super(botToken, botUsername);
 	}
 
+	public <T extends Serializable, Method extends BotApiMethod<T>> void execute(Long chatId, Method method) {
+		try {
+			this.execute(method);
+		} catch (TelegramApiException e) {
+			e.printStackTrace();
+			silent.send("Oops! something wrong happened!", chatId);
+		}
+	}
+	
 	@Override
 	public void onUpdateReceived(Update update) {
 		
@@ -26,20 +35,8 @@ public abstract class AbilityCallbackBot extends AbilityBot {
 			onCallbackQuery(update.getCallbackQuery());
 			answerCallbackQuery(update.getCallbackQuery());
 		}
-	   
+	
     }
-	
-	abstract void onCallbackQuery(CallbackQuery callbackQuery);
-
-	public <T extends Serializable, Method extends BotApiMethod<T>> void execute(Long chatId, Method method) {
-		try {
-			this.execute(method);
-		} catch (TelegramApiException e) {
-			e.printStackTrace();
-			silent.send("Oops! something wrong happened!", chatId);
-		}
-	}
-	
 	
 	private void answerCallbackQuery(CallbackQuery callbackQuery) {
 		
@@ -51,6 +48,11 @@ public abstract class AbilityCallbackBot extends AbilityBot {
 		execute(callbackQuery.getMessage().getChatId(), answerCallbackQuery);
 
 	}
+	
+	abstract void onCallbackQuery(CallbackQuery callbackQuery);
+
+	
+
 	
 
 }
