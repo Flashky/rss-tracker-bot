@@ -13,14 +13,14 @@ public class CallbackQueryEventPublisher {
 
 	// Examples of accepted patterns: "word", "word/another_word" 
 	private final static String CALLBACK_DATA_PATTERN = "(\\w*)[\\/]?(\\w*)";
-	private final Pattern pattern = Pattern.compile(CALLBACK_DATA_PATTERN);
+	private final static Pattern PATTERN = Pattern.compile(CALLBACK_DATA_PATTERN);
 	
 	@Autowired
 	private ApplicationEventPublisher applicationEventPublisher;
 	
     public void publishCallbackQueryEvent(final CallbackQuery callbackQuery) {
         
-		Matcher matcher = pattern.matcher(callbackQuery.getData());
+		Matcher matcher = PATTERN.matcher(callbackQuery.getData());
 		
 		if(matcher.matches()) {
 
