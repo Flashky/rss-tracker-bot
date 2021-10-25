@@ -1,33 +1,27 @@
 package com.flashk.bots.rsstracker.core;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.telegram.abilitybots.api.bot.AbilityBot;
 import org.telegram.abilitybots.api.objects.Ability;
 import org.telegram.abilitybots.api.objects.Locality;
 import org.telegram.abilitybots.api.objects.MessageContext;
 import org.telegram.abilitybots.api.objects.Privacy;
-import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
-import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
-import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup.InlineKeyboardMarkupBuilder;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import com.flashk.bots.rsstracker.core.events.CallbackQueryEventPublisher;
 import com.flashk.bots.rsstracker.core.services.FeedService;
 import com.flashk.bots.rsstracker.core.services.model.Feed;
 
 @Service
-public class RssTrackerBot extends AbilityBot {
+public class RssTrackerBot extends AbilityCallbackBot {
 	
 	@Autowired
 	private FeedService feedService;
@@ -40,19 +34,10 @@ public class RssTrackerBot extends AbilityBot {
 	}
 	
 	@Override
-	public void onUpdateReceived(Update update) {
-		
-		// Handle abilities
-		super.onUpdateReceived(update);
-		
-		// Handle callback queries
-		if(update.getCallbackQuery() != null) {
-			answerCallbackQuery(update.getCallbackQuery());
-			eventPublisher.publishCallbackQueryEvent(update.getCallbackQuery());
-		}
-	   
-    }
-	   
+	void onCallbackQuery(CallbackQuery callbackQuery) {
+		eventPublisher.publishCallbackQueryEvent(callbackQuery);
+	}
+	
 	public Ability show() {
 	    return Ability
 	              .builder()
@@ -77,31 +62,14 @@ public class RssTrackerBot extends AbilityBot {
 				
 	}
 
-	private void answerCallbackQuery(CallbackQuery callbackQuery) {
-		
-		// Prepare answer callback query
-		AnswerCallbackQuery answerCallbackQuery = new AnswerCallbackQuery();
-		answerCallbackQuery.setCallbackQueryId(callbackQuery.getId());
-		
-		// Send answer to Telegram API
-		execute(callbackQuery.getMessage().getChatId(), answerCallbackQuery);
 
-	}
 
 	@Override
 	public long creatorId() {
 		// TODO Auto-generated method stub
 		return 0; 
 	}
-	
-	public <T extends Serializable, Method extends BotApiMethod<T>> void execute(Long chatId, Method method) {
-		try {
-			this.execute(method);
-		} catch (TelegramApiException e) {
-			e.printStackTrace();
-			silent.send("Oops! something wrong happened!", chatId);
-		}
-	}
+
 
 	private SendMessage prepareShowRssFeedsResponse(MessageContext ctx, List<Feed> feeds) {
 		
@@ -145,6 +113,8 @@ public class RssTrackerBot extends AbilityBot {
 		
 		return markupInlineBuilder.build();
 	}
+
+
 	
 
 
