@@ -11,14 +11,15 @@ import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 @Component
 public class CallbackQueryEventPublisher {
 
+	// Examples of accepted patterns: "word", "word/another_word" 
+	private final static String CALLBACK_DATA_PATTERN = "(\\w*)[\\/]?(\\w*)";
+	private final Pattern pattern = Pattern.compile(CALLBACK_DATA_PATTERN);
+	
 	@Autowired
 	private ApplicationEventPublisher applicationEventPublisher;
 	
     public void publishCallbackQueryEvent(final CallbackQuery callbackQuery) {
         
-		//String regex = "(show|edit|delete)[\\/]([a-zA-Z0-9]*)|(show_list)";
-    	String regex = "(\\w*)[\\/]?(\\w*)";
-		Pattern pattern = Pattern.compile(regex);
 		Matcher matcher = pattern.matcher(callbackQuery.getData());
 		
 		if(matcher.matches()) {
