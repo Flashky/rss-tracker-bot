@@ -3,9 +3,6 @@ package com.flashk.bots.rsstracker.core;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,8 +15,6 @@ import org.telegram.abilitybots.api.objects.Privacy;
 import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageReplyMarkup;
-import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
@@ -27,14 +22,18 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import com.flashk.bots.rsstracker.core.events.CallbackQueryEventPublisher;
 import com.flashk.bots.rsstracker.core.services.FeedService;
 import com.flashk.bots.rsstracker.core.services.model.Feed;
 
 @Service
 public class RssTrackerBot extends AbilityBot {
-
+	
 	@Autowired
 	private FeedService feedService;
+	
+	@Autowired 
+	private CallbackQueryEventPublisher eventPublisher;
 	
 	protected RssTrackerBot(@Value("${bot.token}")String botToken, @Value("${bot.username}") String botUsername) {
 		super(botToken, botUsername);	
@@ -48,7 +47,8 @@ public class RssTrackerBot extends AbilityBot {
 		
 		// Handle callback queries
 		if(update.getCallbackQuery() != null) {
-			handle(update.getCallbackQuery());
+			answerCallbackQuery(update.getCallbackQuery());
+			eventPublisher.publishCallbackQueryEvent(update.getCallbackQuery());
 		}
 	   
     }
@@ -76,68 +76,6 @@ public class RssTrackerBot extends AbilityBot {
 		execute(ctx.chatId(), message);
 				
 	}
-	
-	private void handle(CallbackQuery callbackQuery) {
-		
-		System.out.println("Callback query: " +callbackQuery.getData());
-		
-		// Regex:
-		// ((show|edit|delete|)[\/]+?([a-zA-Z0-9]*))|(show_list)
-		// Captura "show/id", "edit/id", "delete/id" o "show_list" para determinar que acción hay que realizar.
-		
-		String regex = "(show|edit|delete)[\\/]([a-zA-Z0-9]*)|(show_list)";
-		Pattern pattern = Pattern.compile(regex);
-		Matcher matcher = pattern.matcher(callbackQuery.getData());
-		
-		if(matcher.matches()) {
-
-			if(matcher.group(3) != null) {
-				System.out.println("Action = " + matcher.group(3));
-			} else {
-				System.out.println("Action = " + matcher.group(1));
-				System.out.println("Id = " + matcher.group(2));
-			}
-
-			
-		}
-		
-		// Parameters: (action,id)
-		// Returns: <T extends Serializable, Method extends BotApiMethod<T>> -> Method
-		
-		// TODO do something with callbackQuery.getData()
-		// String data = callbackQuery.getData();
-		// TODO validate data value to be a valid value
-		// data = "show/<rssFeedId>
-		
-		// Reply Answercallback query
-		answerCallbackQuery(callbackQuery);
-		
-		Optional<Feed> feed = feedService.getFeed("61746f2c9095ec51f15994e3");
-		
-
-		// Reply final message - View RSS feed
-		
-		// Update the text message to display the RSS feed title
-		EditMessageText editMessageText = EditMessageText.builder()
-				.chatId(String.valueOf(callbackQuery.getMessage().getChatId()))
-				.messageId(callbackQuery.getMessage().getMessageId())
-				.text(feed.get().getTitle())
-				.build();
-		
-		execute(callbackQuery.getMessage().getChatId(), editMessageText);
-		
-		// Update the reply markup keyboard to show the RSS feed options
-		EditMessageReplyMarkup editMessage = EditMessageReplyMarkup.builder()
-				.messageId(callbackQuery.getMessage().getMessageId())
-				.chatId(String.valueOf(callbackQuery.getMessage().getChatId()))
-				.replyMarkup(createRssFeedItemReplyMarkup(feed.get()))
-				.build();
-				
-		execute(callbackQuery.getMessage().getChatId(), editMessage);
-	
-
-		System.out.println(callbackQuery);
-	}
 
 	private void answerCallbackQuery(CallbackQuery callbackQuery) {
 		
@@ -156,7 +94,7 @@ public class RssTrackerBot extends AbilityBot {
 		return 0; 
 	}
 	
-	private <T extends Serializable, Method extends BotApiMethod<T>> void execute(Long chatId, Method method) {
+	public <T extends Serializable, Method extends BotApiMethod<T>> void execute(Long chatId, Method method) {
 		try {
 			this.execute(method);
 		} catch (TelegramApiException e) {
@@ -208,40 +146,6 @@ public class RssTrackerBot extends AbilityBot {
 		return markupInlineBuilder.build();
 	}
 	
-	private InlineKeyboardMarkup createRssFeedItemReplyMarkup(Feed feed) {
-		
-		InlineKeyboardMarkupBuilder markupInlineBuilder = InlineKeyboardMarkup.builder();
 
-		List<InlineKeyboardButton> row = new ArrayList<>();
-		
-		// View URL button
-		InlineKeyboardButton keyboardButton = InlineKeyboardButton.builder()
-				.text("View RSS feed")
-				.url(feed.getUrl())
-				.build();
-		
-		row.add(keyboardButton);
-		
-		// Delete button
-		keyboardButton = InlineKeyboardButton.builder()
-				.text("Delete RSS feed")
-				.callbackData("delete/"+feed.getId())
-				.build();
-		
-		row.add(keyboardButton);
-		markupInlineBuilder.keyboardRow(row);
-		
-		// Back to main menu
-		row = new ArrayList<>();
-		keyboardButton = InlineKeyboardButton.builder()
-				.text("<< Return to feed list")
-				.callbackData("show_all/")
-				.build();
-		
-		row.add(keyboardButton);
-		markupInlineBuilder.keyboardRow(row);
-		
-		return markupInlineBuilder.build();
-	}
 
 }
