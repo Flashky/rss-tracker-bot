@@ -16,23 +16,17 @@ public class CallbackQueryEventPublisher {
 	
     public void publishCallbackQueryEvent(final CallbackQuery callbackQuery) {
         
-		String regex = "(show|edit|delete)[\\/]([a-zA-Z0-9]*)|(show_list)";
+		//String regex = "(show|edit|delete)[\\/]([a-zA-Z0-9]*)|(show_list)";
+    	String regex = "(\\w*)[\\/]?(\\w*)";
 		Pattern pattern = Pattern.compile(regex);
 		Matcher matcher = pattern.matcher(callbackQuery.getData());
 		
 		if(matcher.matches()) {
 
-			String action;
-			String id = "";
-			CallbackQueryEvent event;
-			if(matcher.group(3) != null) {
-				action = matcher.group(3);
-				event = new CallbackQueryEvent(action, callbackQuery);
-			} else {
-				action = matcher.group(1);
-				id = matcher.group(2);
-				event = new CallbackQueryEvent(action, callbackQuery, id);
-			}	
+			String action = matcher.group(1);
+			String id = matcher.group(2);
+			
+			CallbackQueryEvent event = new CallbackQueryEvent(action, callbackQuery, id);
 
 	    	System.out.println("Publishing custom event. ");  	
 	        applicationEventPublisher.publishEvent(event);
