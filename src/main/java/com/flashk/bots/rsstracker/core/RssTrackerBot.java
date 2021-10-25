@@ -38,15 +38,27 @@ public class RssTrackerBot extends AbilityCallbackBot {
 		eventPublisher.publishCallbackQueryEvent(callbackQuery);
 	}
 	
-	public Ability show() {
+	public Ability showfeeds() {
 	    return Ability
 	              .builder()
-	              .name("show")
+	              .name("showfeeds")
 	              .info("Show your RSS feeds")
 	              .input(0)
 	              .locality(Locality.USER)
 	              .privacy(Privacy.PUBLIC)
 	              .action(this::showRssFeeds)
+	              .build();
+	}
+	
+	public Ability addfeed() {
+	    return Ability
+	              .builder()
+	              .name("addfeed")
+	              .info("Add a new RSS feed")
+	              .input(0)
+	              .locality(Locality.USER)
+	              .privacy(Privacy.PUBLIC)
+	              .action(this::addRssFeed)
 	              .build();
 	}
 	
@@ -62,7 +74,17 @@ public class RssTrackerBot extends AbilityCallbackBot {
 				
 	}
 
-
+	private void addRssFeed(MessageContext ctx) {
+		
+		// Prepare and send response
+		SendMessage message = SendMessage.builder()
+				.chatId(String.valueOf(ctx.chatId()))
+				.text("What RSS feed do you want to add?")
+				.build();
+		
+		execute(ctx.chatId(), message);
+				
+	}
 
 	@Override
 	public long creatorId() {
