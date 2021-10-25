@@ -32,8 +32,8 @@ public abstract class AbilityCallbackBot extends AbilityBot {
 		
 		// Handle callback queries
 		if(update.getCallbackQuery() != null) {
-			onCallbackQuery(update.getCallbackQuery());
 			answerCallbackQuery(update.getCallbackQuery());
+			onCallbackQuery(update.getCallbackQuery());
 		}
 	
     }
