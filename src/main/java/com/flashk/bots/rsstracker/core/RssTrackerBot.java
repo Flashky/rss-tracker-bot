@@ -27,15 +27,11 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-import com.flashk.bots.rsstracker.config.properties.BotConfig;
 import com.flashk.bots.rsstracker.core.services.FeedService;
 import com.flashk.bots.rsstracker.core.services.model.Feed;
 
 @Service
 public class RssTrackerBot extends AbilityBot {
-
-	@Autowired
-	private BotConfig config;
 
 	@Autowired
 	private FeedService feedService;
@@ -152,16 +148,6 @@ public class RssTrackerBot extends AbilityBot {
 		// Send answer to Telegram API
 		execute(callbackQuery.getMessage().getChatId(), answerCallbackQuery);
 
-	}
-
-	@Override
-	public String getBotUsername() {
-		return config.getUsername();
-	}
-
-	@Override
-	public String getBotToken() {
-		return config.getToken();
 	}
 
 	@Override
