@@ -29,6 +29,9 @@ public class RssTrackerBot extends AbilityCallbackBot {
 	@Autowired 
 	private CallbackQueryEventPublisher eventPublisher;
 	
+	@Value("${bot.creatorId}")
+	private Long creatorId;
+	
 	protected RssTrackerBot(@Value("${bot.token}")String botToken, @Value("${bot.username}") String botUsername) {
 		super(botToken, botUsername);	
 	}
@@ -88,8 +91,7 @@ public class RssTrackerBot extends AbilityCallbackBot {
 
 	@Override
 	public long creatorId() {
-		// TODO Auto-generated method stub
-		return 0; 
+		return creatorId;
 	}
 
 

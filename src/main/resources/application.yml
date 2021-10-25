@@ -1,3 +1,4 @@
 bot:
   token: ${TELEGRAM_BOT_TOKEN}
   username: ${TELEGRAM_BOT_USERNAME}
+  creatorId: ${TELEGRAM_BOT_CREATOR_ID}
