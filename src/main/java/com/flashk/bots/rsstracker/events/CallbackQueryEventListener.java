@@ -41,20 +41,15 @@ public class CallbackQueryEventListener {
      	List<Feed> feeds = feedService.listFeeds();
         
      	// Prepare reply text and keyboard markup
-        String textMessage = "Your RSS feeds:";
         InlineKeyboardMarkup replyMarkup = createRssFeedListReplyMarkup(feeds);
         
-     	// Update the text message to display the RSS feed title
-		EditMessageText editMessageText = createEditMessageText(textMessage, callbackQuery);
-		bot.execute(callbackQuery.getMessage().getChatId(), editMessageText);
-		
-		// Update the reply markup keyboard to show the RSS feed options
-		EditMessageReplyMarkup editMessage = createEditMessageReplyMarkup(callbackQuery, replyMarkup);
-		bot.execute(callbackQuery.getMessage().getChatId(), editMessage);
+     	// Send message text and markup back to the user
+		sendEditMessageText(callbackQuery, "Your RSS feeds:");
+		sendEditMessageReplyMarkup(callbackQuery, replyMarkup);
 		
     }
-    
-    @EventListener(condition = "#event.action eq 'show'")
+
+	@EventListener(condition = "#event.action eq 'show'")
     public void onShowFeed(CallbackQueryEvent event) {
         
     	System.out.println("show feed " +event.getRssFeedId());
@@ -63,48 +58,32 @@ public class CallbackQueryEventListener {
         Optional<Feed> feed = feedService.getFeed(event.getRssFeedId());
 		
         // Prepare reply text and keyboard markup
-        String textMessage = feed.get().getTitle();
         InlineKeyboardMarkup replyMarkup = createRssFeedItemReplyMarkup(feed.get());
 
-		// Update the text message to display the RSS feed title
-		EditMessageText editMessageText = createEditMessageText(textMessage, callbackQuery);
-		bot.execute(callbackQuery.getMessage().getChatId(), editMessageText);
-		
-		// Update the reply markup keyboard to show the RSS feed options
-		EditMessageReplyMarkup editMessage = createEditMessageReplyMarkup(callbackQuery, replyMarkup);
-		bot.execute(callbackQuery.getMessage().getChatId(), editMessage);
+     	// Send message text and markup back to the user
+		sendEditMessageText(callbackQuery, feed.get().getTitle());
+		sendEditMessageReplyMarkup(callbackQuery, replyMarkup);
 		
     }
-    
-    @EventListener(condition = "#event.action eq 'delete'")
+
+	@EventListener(condition = "#event.action eq 'delete'")
     public void onDeleteFeed(CallbackQueryEvent event) {
         System.out.println("delete feed " +event.getRssFeedId());
     }
+	
     
-
-	/**
-	 * @param textMessage
-	 * @param callbackQuery
-	 * @return
-	 */
-	private EditMessageText createEditMessageText(String textMessage, CallbackQuery callbackQuery) {
+    private void sendEditMessageText(CallbackQuery callbackQuery, String textMessage) {
 		
-		EditMessageText editMessageText = EditMessageText.builder()
+    	EditMessageText editMessageText = EditMessageText.builder()
 				.chatId(String.valueOf(callbackQuery.getMessage().getChatId()))
 				.messageId(callbackQuery.getMessage().getMessageId())
 				.text(textMessage)
 				.build();
-		
-		return editMessageText;
+    	
+    	bot.execute(callbackQuery.getMessage().getChatId(), editMessageText);
 	}
-	
-	/**
-	 * @param callbackQuery
-	 * @param replyMarkup
-	 * @return
-	 */
-	private EditMessageReplyMarkup createEditMessageReplyMarkup(CallbackQuery callbackQuery,
-			InlineKeyboardMarkup replyMarkup) {
+    
+    private void sendEditMessageReplyMarkup(CallbackQuery callbackQuery, InlineKeyboardMarkup replyMarkup) {
 		
 		EditMessageReplyMarkup editMessage = EditMessageReplyMarkup.builder()
 				.messageId(callbackQuery.getMessage().getMessageId())
@@ -112,7 +91,8 @@ public class CallbackQueryEventListener {
 				.replyMarkup(replyMarkup)
 				.build();
 		
-		return editMessage;
+		bot.execute(callbackQuery.getMessage().getChatId(), editMessage);
+		
 	}
 	
 	private InlineKeyboardMarkup createRssFeedListReplyMarkup(List<Feed> feeds) {
