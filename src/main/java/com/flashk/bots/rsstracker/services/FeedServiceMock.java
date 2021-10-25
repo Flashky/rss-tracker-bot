@@ -1,4 +1,4 @@
-package com.flashk.bots.rsstracker.core.services;
+package com.flashk.bots.rsstracker.services;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -8,7 +8,7 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
-import com.flashk.bots.rsstracker.core.services.model.Feed;
+import com.flashk.bots.rsstracker.services.model.Feed;
 
 @Service
 public class FeedServiceMock implements FeedService {

@@ -16,9 +16,9 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup.InlineKeyboardMarkupBuilder;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 
-import com.flashk.bots.rsstracker.core.events.CallbackQueryEventPublisher;
-import com.flashk.bots.rsstracker.core.services.FeedService;
-import com.flashk.bots.rsstracker.core.services.model.Feed;
+import com.flashk.bots.rsstracker.events.CallbackQueryEventPublisher;
+import com.flashk.bots.rsstracker.services.FeedService;
+import com.flashk.bots.rsstracker.services.model.Feed;
 
 @Service
 public class RssTrackerBot extends AbilityCallbackBot {

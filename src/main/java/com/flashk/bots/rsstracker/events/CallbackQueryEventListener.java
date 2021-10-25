@@ -1,4 +1,4 @@
-package com.flashk.bots.rsstracker.core.events;
+package com.flashk.bots.rsstracker.events;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,8 +15,8 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 
 import com.flashk.bots.rsstracker.core.RssTrackerBot;
-import com.flashk.bots.rsstracker.core.services.FeedService;
-import com.flashk.bots.rsstracker.core.services.model.Feed;
+import com.flashk.bots.rsstracker.services.FeedService;
+import com.flashk.bots.rsstracker.services.model.Feed;
 
 /**
  * @see https://reflectoring.io/spring-boot-application-events-explained/
@@ -32,7 +32,7 @@ public class CallbackQueryEventListener {
 	private FeedService feedService;
 	
     @EventListener(condition = "#event.action eq 'show_list'")
-    public void handleShowRssFeeds(CallbackQueryEvent event) {
+    public void onShowFeeds(CallbackQueryEvent event) {
        
     	System.out.println("show_list");
      	CallbackQuery callbackQuery = event.getCallbackQuery();
@@ -55,7 +55,7 @@ public class CallbackQueryEventListener {
     }
     
     @EventListener(condition = "#event.action eq 'show'")
-    public void handleShowFeedItem(CallbackQueryEvent event) {
+    public void onShowFeed(CallbackQueryEvent event) {
         
     	System.out.println("show feed " +event.getRssFeedId());
         CallbackQuery callbackQuery = event.getCallbackQuery();
@@ -77,7 +77,7 @@ public class CallbackQueryEventListener {
     }
     
     @EventListener(condition = "#event.action eq 'delete'")
-    public void handleDeleteFeedItem(CallbackQueryEvent event) {
+    public void onDeleteFeed(CallbackQueryEvent event) {
         System.out.println("delete feed " +event.getRssFeedId());
     }
     

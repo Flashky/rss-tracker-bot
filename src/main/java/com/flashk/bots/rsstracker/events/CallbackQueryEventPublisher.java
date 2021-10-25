@@ -1,4 +1,4 @@
-package com.flashk.bots.rsstracker.core.events;
+package com.flashk.bots.rsstracker.events;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

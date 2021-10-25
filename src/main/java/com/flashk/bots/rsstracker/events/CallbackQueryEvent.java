@@ -1,4 +1,4 @@
-package com.flashk.bots.rsstracker.core.events;
+package com.flashk.bots.rsstracker.events;
 
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 

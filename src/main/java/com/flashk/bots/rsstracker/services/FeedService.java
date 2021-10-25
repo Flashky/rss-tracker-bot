@@ -1,9 +1,9 @@
-package com.flashk.bots.rsstracker.core.services;
+package com.flashk.bots.rsstracker.services;
 
 import java.util.List;
 import java.util.Optional;
 
-import com.flashk.bots.rsstracker.core.services.model.Feed;
+import com.flashk.bots.rsstracker.services.model.Feed;
 
 public interface FeedService {
 

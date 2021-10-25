@@ -1,4 +1,4 @@
-package com.flashk.bots.rsstracker.core.services.model;
+package com.flashk.bots.rsstracker.services.model;
 
 import lombok.Getter;
 import lombok.Setter;
