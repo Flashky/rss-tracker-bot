@@ -9,6 +9,6 @@ public interface FeedService {
 
 	List<Feed> listFeeds();
 	Optional<Feed> getFeed(String feedId);
-
+	void deleteFeed(String feedId);
 	
 }

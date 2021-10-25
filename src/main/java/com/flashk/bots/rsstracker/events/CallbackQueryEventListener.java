@@ -68,7 +68,13 @@ public class CallbackQueryEventListener {
 
 	@EventListener(condition = "#event.action eq 'delete'")
     public void onDeleteFeed(CallbackQueryEvent event) {
-        System.out.println("delete feed " +event.getRssFeedId());
+       
+		System.out.println("delete feed " +event.getRssFeedId());
+        
+		// Remove the feed
+        feedService.deleteFeed(event.getRssFeedId());
+        
+        sendEditMessageText(event.getCallbackQuery(), "The feed has been removed.");
     }
 	
     

@@ -48,4 +48,11 @@ public class FeedServiceMock implements FeedService {
 	
 	}
 
+	@Override
+	public void deleteFeed(String feedId) {
+		
+		feeds.remove(feedId);
+		
+	}
+
 }
