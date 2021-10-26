@@ -40,12 +40,13 @@ public class CallbackQueryEventListener {
         // Obtain feeds
      	List<Feed> feeds = feedService.listFeeds();
         
-     	// Prepare reply text and keyboard markup
-        InlineKeyboardMarkup replyMarkup = createRssFeedListReplyMarkup(feeds);
-        
      	// Send message text and markup back to the user
-		sendEditMessageText(callbackQuery, "Your RSS feeds:");
-		sendEditMessageReplyMarkup(callbackQuery, replyMarkup);
+        if(feeds.isEmpty()) {
+        	sendEditMessageText(callbackQuery, "You don't have any feeds.");
+        } else {
+    		sendEditMessageText(callbackQuery, "Your RSS feeds:");
+    		sendEditMessageReplyMarkup(callbackQuery, createRssFeedListReplyMarkup(feeds));
+        }
 		
     }
 
@@ -74,8 +75,25 @@ public class CallbackQueryEventListener {
 		// Remove the feed
         feedService.deleteFeed(event.getRssFeedId());
         
+        // Send message text and markup back to the user
         sendEditMessageText(event.getCallbackQuery(), "The feed has been removed.");
+        sendEditMessageReplyMarkup(event.getCallbackQuery(), menuBackToFeedList());
     }
+
+	private InlineKeyboardMarkup menuBackToFeedList() {
+		
+		InlineKeyboardButton showListButton = InlineKeyboardButton.builder()
+        		.text("<< Back to RSS Feed List")
+        		.callbackData("show_list")
+        		.build();
+        
+        List<InlineKeyboardButton> optionsRow = new ArrayList<>();
+        optionsRow.add(showListButton);
+        
+        return InlineKeyboardMarkup.builder()
+        		.keyboardRow(optionsRow)
+        		.build();
+	}
 	
     
     private void sendEditMessageText(CallbackQuery callbackQuery, String textMessage) {
@@ -154,7 +172,7 @@ public class CallbackQueryEventListener {
 		// Back to main menu
 		row = new ArrayList<>();
 		keyboardButton = InlineKeyboardButton.builder()
-				.text("<< Return to feed list")
+				.text("<< Back to RSS Feed List")
 				.callbackData("show_list")
 				.build();
 		
