@@ -6,7 +6,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.apache.commons.validator.routines.UrlValidator;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 
 import com.flashk.bots.rsstracker.services.model.Feed;
 
@@ -52,6 +54,21 @@ public class FeedServiceMock implements FeedService {
 	public void deleteFeed(String feedId) {
 		
 		feeds.remove(feedId);
+		
+	}
+
+	@Override
+	public Feed createFeed(Feed feed) {
+		
+		Assert.notNull(feed, "Feed must not be null!");
+		Assert.isTrue(UrlValidator.getInstance().isValid(feed.getUrl()), "Feed URL must be a valid url.");
+		
+		feed.setId("1234");
+		feed.setTitle("Torrentracker: The Walking Dead");
+		
+		feeds.put(feed.getId(), feed);
+		
+		return feed;
 		
 	}
 
