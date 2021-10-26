@@ -2,16 +2,22 @@ package com.flashk.bots.rsstracker.core;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.telegram.abilitybots.api.bot.BaseAbilityBot;
 import org.telegram.abilitybots.api.objects.Ability;
+import org.telegram.abilitybots.api.objects.Flag;
 import org.telegram.abilitybots.api.objects.Locality;
 import org.telegram.abilitybots.api.objects.MessageContext;
 import org.telegram.abilitybots.api.objects.Privacy;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage.SendMessageBuilder;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
+import org.telegram.telegrambots.meta.api.objects.Message;
+import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup.InlineKeyboardMarkupBuilder;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
@@ -41,7 +47,7 @@ public class RssTrackerBot extends AbilityCallbackBot {
 		eventPublisher.publishCallbackQueryEvent(callbackQuery);
 	}
 	
-	public Ability showfeeds() {
+	public Ability showFeeds() {
 	    return Ability
 	              .builder()
 	              .name("showfeeds")
@@ -49,11 +55,12 @@ public class RssTrackerBot extends AbilityCallbackBot {
 	              .input(0)
 	              .locality(Locality.USER)
 	              .privacy(Privacy.PUBLIC)
-	              .action(this::showRssFeeds)
+	              .action(this::showFeeds)
 	              .build();
 	}
 	
-	public Ability addfeed() {
+	// https://github.com/rubenlagus/TelegramBots/wiki/Using-Replies
+	public Ability addFeed() {
 	    return Ability
 	              .builder()
 	              .name("addfeed")
@@ -61,11 +68,35 @@ public class RssTrackerBot extends AbilityCallbackBot {
 	              .input(0)
 	              .locality(Locality.USER)
 	              .privacy(Privacy.PUBLIC)
-	              .action(this::addRssFeed)
+	              .action(ctx -> silent.forceReply("What RSS feed do you want to add?", ctx.chatId()))
+	              .reply(this::addRssFeed,
+	            	// Conditions to trigger the action on the reply:
+	            	// The update is a reply to the specified text message from the bot.
+	            	Flag.MESSAGE,
+	            	Flag.REPLY,
+	            	isReplyToBot(),
+	            	isReplyToMessage("What RSS feed do you want to add?"))
 	              .build();
 	}
 	
-	private void showRssFeeds(MessageContext ctx) {
+    private Predicate<Update> isReplyToBot() {
+    	
+    	return upd -> {
+    		System.out.println("Checking reply to bot");
+    		return upd.getMessage().getReplyToMessage().getFrom().getUserName().equalsIgnoreCase(getBotUsername());
+    	};
+    }
+    
+	private Predicate<Update> isReplyToMessage(String message) {
+		return upd -> {
+			System.out.println("Checking reply to message");
+	        Message reply = upd.getMessage().getReplyToMessage();
+	        boolean isReplyToMessage= reply.hasText() && reply.getText().equalsIgnoreCase(message); 
+	        return isReplyToMessage;
+		};
+    }
+    
+	private void showFeeds(MessageContext ctx) {
 		
 		// Obtain feeds
 		List<Feed> feeds = feedService.listFeeds();
@@ -77,16 +108,11 @@ public class RssTrackerBot extends AbilityCallbackBot {
 				
 	}
 
-	private void addRssFeed(MessageContext ctx) {
+	private void addRssFeed(BaseAbilityBot bot, Update update) {
 		
-		// Prepare and send response
-		SendMessage message = SendMessage.builder()
-				.chatId(String.valueOf(ctx.chatId()))
-				.text("What RSS feed do you want to add?")
-				.build();
-		
-		execute(ctx.chatId(), message);
-				
+		System.out.println("reply!!");;
+  	  	silent.send("Your new tracker is: " + update.getMessage().getText(), update.getMessage().getChatId());
+			
 	}
 
 	@Override
@@ -97,18 +123,17 @@ public class RssTrackerBot extends AbilityCallbackBot {
 
 	private SendMessage prepareShowRssFeedsResponse(MessageContext ctx, List<Feed> feeds) {
 		
-		SendMessage message = new SendMessage();
-		message.setChatId(String.valueOf(ctx.chatId()));
+		SendMessageBuilder sendMessageBuilder = SendMessage.builder()
+				.chatId(String.valueOf(ctx.chatId()));
 		
 		if(feeds.isEmpty()) {
-			message.setText("You don't have any feeds.");
+			sendMessageBuilder.text("You don't have any feeds.");
 		} else {
-			message.setText("Your RSS feeds:");
-			InlineKeyboardMarkup rssFeedListReplyMarkup = createRssFeedListReplyMarkup(feeds);
-			message.setReplyMarkup(rssFeedListReplyMarkup);
+			sendMessageBuilder.text("Your RSS feeds:")
+				.replyMarkup(createRssFeedListReplyMarkup(feeds));
 		}
 
-		return message;
+		return sendMessageBuilder.build();
 	}
 	
 	private InlineKeyboardMarkup createRssFeedListReplyMarkup(List<Feed> feeds) {
