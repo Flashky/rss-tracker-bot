@@ -54,6 +54,11 @@ public class CallbackQueryEventListener {
     public void onShowFeed(CallbackQueryEvent event) {
         
     	System.out.println("show feed " +event.getRssFeedId());
+    	
+		// TODO When trying to delete a non existing feed, throw an exception
+		// TODO At the exception handler, use an AnswerCallbackQuery using show_alert == true
+		// TODO More info: https://core.telegram.org/bots/api#answercallbackquery
+    	
         CallbackQuery callbackQuery = event.getCallbackQuery();
         
         Optional<Feed> feed = feedService.getFeed(event.getRssFeedId());
@@ -72,6 +77,10 @@ public class CallbackQueryEventListener {
        
 		System.out.println("delete feed " +event.getRssFeedId());
         
+		// TODO When trying to delete a non existing feed, throw an exception
+		// TODO At the exception handler, use an AnswerCallbackQuery using show_alert == true
+		// TODO More info: https://core.telegram.org/bots/api#answercallbackquery
+		
 		// Remove the feed
         feedService.deleteFeed(event.getRssFeedId());
         
