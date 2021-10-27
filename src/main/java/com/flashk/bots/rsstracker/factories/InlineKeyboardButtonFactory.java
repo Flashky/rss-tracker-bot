@@ -34,5 +34,7 @@ public interface InlineKeyboardButtonFactory {
 	 * @return InlineKeyboardButton
 	 */
 	InlineKeyboardButton createShowFeedListButton(String buttonText);
+
+	InlineKeyboardButton createShowFeedListPageButton(String buttonText, Integer pageNumber);
 	
 }

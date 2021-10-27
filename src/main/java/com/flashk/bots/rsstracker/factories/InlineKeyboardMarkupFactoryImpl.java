@@ -64,16 +64,23 @@ public class InlineKeyboardMarkupFactoryImpl implements InlineKeyboardMarkupFact
 
 		InlineKeyboardMarkupBuilder markupInlineBuilder = InlineKeyboardMarkup.builder();
 		
+		List<InlineKeyboardButton> feedRow;
+		
 		for(Feed feed : feeds) {
 			
 			// Add the button to a new row
-			List<InlineKeyboardButton> feedRow = new ArrayList<>();
+			feedRow = new ArrayList<>();
 			feedRow.add(buttonFactory.createShowFeedSettingsButton(feed.getTitle(), feed.getId()));
 
 			markupInlineBuilder.keyboardRow(feedRow);
 		}
 		
+		feedRow = new ArrayList<>();
+		feedRow.add(buttonFactory.createShowFeedListPageButton("<<", 1));
+		feedRow.add(buttonFactory.createShowFeedListPageButton(">>", 3));
 		
+		markupInlineBuilder.keyboardRow(feedRow);
+	
 		return markupInlineBuilder.build();
 	}
 

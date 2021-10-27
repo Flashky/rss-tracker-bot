@@ -19,12 +19,16 @@ public class FeedServiceMock implements FeedService {
 	
 	public FeedServiceMock() {
 		
-		Feed feed = new Feed();
-		feed.setId("61746f2c9095ec51f15994e3");
-		feed.setUrl("https://hd-olimpo.club/rss/1631.4ff22951d0562feb3b966d7e74172c44");
-		feed.setTitle("HD-Olimpo: Notification - Invasión");
+		Feed feed;
+		for(int i = 0; i < 9; i ++) {
+			
+			feed = new Feed();
+			feed.setId(String.valueOf(i));
+			feed.setUrl("https://hd-olimpo.club/rss/1631.4ff22951d0562feb3b966d7e74172c44");
+			feed.setTitle("HD-Olimpo: Notification - Invasión");
 		
-		feeds.put("61746f2c9095ec51f15994e3", feed);
+			feeds.put(String.valueOf(i), feed);
+		}
 		
 		feed = new Feed();
 		feed.setId("6152094e254752701b0544d3");

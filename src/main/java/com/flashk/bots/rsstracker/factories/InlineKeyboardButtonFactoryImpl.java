@@ -45,4 +45,14 @@ public class InlineKeyboardButtonFactoryImpl implements InlineKeyboardButtonFact
 
 	}
 
+	@Override
+	public InlineKeyboardButton createShowFeedListPageButton(String buttonText, Integer pageNumber) {
+
+		return InlineKeyboardButton.builder()
+        		.text(buttonText)
+        		.callbackData("show_list?page="+String.valueOf(pageNumber))
+        		.build();
+
+	}
+	
 }
