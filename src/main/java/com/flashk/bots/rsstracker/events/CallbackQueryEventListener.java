@@ -75,7 +75,7 @@ public class CallbackQueryEventListener {
 	@EventListener(condition = "#event.action eq 'delete'")
     public void onDeleteFeed(CallbackQueryEvent event) {
        
-		System.out.println("confirm_delete feed " +event.getRssFeedId());
+		System.out.println("delete feed " +event.getRssFeedId());
         
         // TODO When trying to delete a non existing feed, throw an exception
         // TODO At the exception handler, use an AnswerCallbackQuery using show_alert == true
@@ -92,7 +92,7 @@ public class CallbackQueryEventListener {
 	@EventListener(condition = "#event.action eq 'confirm_delete'")
     public void onConfirmDeleteFeed(CallbackQueryEvent event) {
        
-		System.out.println("delete feed " +event.getRssFeedId());
+		System.out.println("confirm_delete feed " +event.getRssFeedId());
         
         // Send message text and markup back to the user
         sendEditMessageText(event.getCallbackQuery(), "Are you sure you want to delete the RSS feed?");
