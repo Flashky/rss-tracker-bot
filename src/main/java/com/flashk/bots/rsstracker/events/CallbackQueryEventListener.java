@@ -1,6 +1,5 @@
 package com.flashk.bots.rsstracker.events;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -11,11 +10,10 @@ import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageRe
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup.InlineKeyboardMarkupBuilder;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 
 import com.flashk.bots.rsstracker.core.RssTrackerBot;
 import com.flashk.bots.rsstracker.factories.InlineKeyboardButtonFactory;
+import com.flashk.bots.rsstracker.factories.InlineKeyboardMarkupFactory;
 import com.flashk.bots.rsstracker.services.FeedService;
 import com.flashk.bots.rsstracker.services.model.Feed;
 
@@ -31,6 +29,9 @@ public class CallbackQueryEventListener {
 	
 	@Autowired
 	private FeedService feedService;
+	
+	@Autowired
+	private InlineKeyboardMarkupFactory replyMarkupFactory;
 	
 	@Autowired
 	private InlineKeyboardButtonFactory buttonFactory;
@@ -50,7 +51,8 @@ public class CallbackQueryEventListener {
         	sendEditMessageText(callbackQuery, "You don't have any feeds.");
         } else {
     		sendEditMessageText(callbackQuery, "Your RSS feeds:");
-    		sendEditMessageReplyMarkup(callbackQuery, createRssFeedListReplyMarkup(feeds));
+    		sendEditMessageReplyMarkup(callbackQuery, 
+    				replyMarkupFactory.createFeedListReplyMarkup(feeds));
         }
 		
     }
@@ -67,13 +69,11 @@ public class CallbackQueryEventListener {
         CallbackQuery callbackQuery = event.getCallbackQuery();
         
         Optional<Feed> feed = feedService.getFeed(event.getRssFeedId());
-		
-        // Prepare reply text and keyboard markup
-        InlineKeyboardMarkup replyMarkup = createRssFeedItemReplyMarkup(feed.get());
 
      	// Send message text and markup back to the user
 		sendEditMessageText(callbackQuery, feed.get().getTitle());
-		sendEditMessageReplyMarkup(callbackQuery, replyMarkup);
+		sendEditMessageReplyMarkup(callbackQuery, 
+				replyMarkupFactory.createShowFeedSettingsReplyMarkup(feed.get()));
 		
     }
 
@@ -91,7 +91,9 @@ public class CallbackQueryEventListener {
         
         // Send message text and markup back to the user
         sendEditMessageText(event.getCallbackQuery(), "The feed has been removed.");
-        sendEditMessageReplyMarkup(event.getCallbackQuery(), menuBackToFeedList());
+        sendEditMessageReplyMarkup(event.getCallbackQuery(), 
+        		replyMarkupFactory.createSingleButtonReplyMarkup(
+        				buttonFactory.createShowFeedListButton("<<Back to RSS Feed List")));
     }
 
 	@EventListener(condition = "#event.action eq 'confirm_delete'")
@@ -101,31 +103,9 @@ public class CallbackQueryEventListener {
         
         // Send message text and markup back to the user
         sendEditMessageText(event.getCallbackQuery(), "Are you sure you want to delete the RSS feed?");
-        sendEditMessageReplyMarkup(event.getCallbackQuery(), menuConfirmDeleteFeed(event.getRssFeedId()));
+        sendEditMessageReplyMarkup(event.getCallbackQuery(), 
+        		replyMarkupFactory.createDeleteFeedConfirmationReplyMarkup(event.getRssFeedId()));
     }
-	
-	private InlineKeyboardMarkup menuBackToFeedList() {
-		    
-        List<InlineKeyboardButton> optionsRow = new ArrayList<>();
-        optionsRow.add(buttonFactory.createShowFeedListButton("<< Back to RSS Feed List"));
-        
-        return InlineKeyboardMarkup.builder()
-        		.keyboardRow(optionsRow)
-        		.build();
-	}
-	
-	private InlineKeyboardMarkup menuConfirmDeleteFeed(String rssFeedId) {
-		
-        List<InlineKeyboardButton> optionsRow = new ArrayList<>();
-        optionsRow.add(buttonFactory.createDeleteFeedButton("Yes", rssFeedId));
-        optionsRow.add(buttonFactory.createShowFeedSettingsButton("No", rssFeedId));
-        
-        return InlineKeyboardMarkup.builder()
-        		.keyboardRow(optionsRow)
-        		.build();
-	}
-	
-
 	
     private void sendEditMessageText(CallbackQuery callbackQuery, String textMessage) {
 		
@@ -149,56 +129,5 @@ public class CallbackQueryEventListener {
 		bot.execute(callbackQuery.getMessage().getChatId(), editMessage);
 		
 	}
-	
-	private InlineKeyboardMarkup createRssFeedListReplyMarkup(List<Feed> feeds) {
-		
-		// Pre: feeds is not empty
-		
-		InlineKeyboardMarkupBuilder markupInlineBuilder = InlineKeyboardMarkup.builder();
-		
-		List<List<InlineKeyboardButton>> feedRows = new ArrayList<>();
-		
-		for(Feed feed : feeds) {
-			
-			InlineKeyboardButton feedButton = buttonFactory.createShowFeedSettingsButton(feed.getTitle(), feed.getId());
-			
-			// Add the button to a new row
-			List<InlineKeyboardButton> feedRow = new ArrayList<>();
-			feedRow.add(feedButton);
-			feedRows.add(feedRow);
-			
-			markupInlineBuilder.keyboardRow(feedRow);
-		}
-		
-		
-		return markupInlineBuilder.build();
-	}
-	
-	private InlineKeyboardMarkup createRssFeedItemReplyMarkup(Feed feed) {
-		
-		InlineKeyboardMarkupBuilder markupInlineBuilder = InlineKeyboardMarkup.builder();
 
-		List<InlineKeyboardButton> row = new ArrayList<>();
-		
-		// View URL button
-		InlineKeyboardButton keyboardButton = InlineKeyboardButton.builder()
-				.text("View RSS feed")
-				.url(feed.getUrl())
-				.build();
-		
-		row.add(keyboardButton);
-		
-		// Delete button		
-		row.add(buttonFactory.createDeleteFeedConfirmationButton("Delete RSS Feed", feed.getId()));
-		markupInlineBuilder.keyboardRow(row);
-		
-		// Back to main menu
-		row = new ArrayList<>();
-		row.add(buttonFactory.createShowFeedListButton("<< Back to RSS Feed List"));
-		
-		markupInlineBuilder.keyboardRow(row);
-		
-		return markupInlineBuilder.build();
-	}
-    
 }

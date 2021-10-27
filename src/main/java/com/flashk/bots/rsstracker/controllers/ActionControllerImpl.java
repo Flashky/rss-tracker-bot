@@ -1,6 +1,5 @@
 package com.flashk.bots.rsstracker.controllers;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,11 +10,8 @@ import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage.SendMessageBuilder;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup.InlineKeyboardMarkupBuilder;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 
-import com.flashk.bots.rsstracker.factories.InlineKeyboardButtonFactory;
+import com.flashk.bots.rsstracker.factories.InlineKeyboardMarkupFactory;
 import com.flashk.bots.rsstracker.services.FeedService;
 import com.flashk.bots.rsstracker.services.model.Feed;
 
@@ -26,7 +22,7 @@ public class ActionControllerImpl implements ActionController {
 	private FeedService feedService;
 	
 	@Autowired
-	private InlineKeyboardButtonFactory buttonFactory;
+	private InlineKeyboardMarkupFactory replyMarkupFactory;
 	
 	@Override
 	public void showFeeds(MessageContext ctx) {
@@ -36,9 +32,6 @@ public class ActionControllerImpl implements ActionController {
 		
 		// Prepare and send response
 		SendMessage message = prepareShowRssFeedsResponse(ctx, feeds);
-		
-		//execute(ctx.chatId(), message);
-		
 		ctx.bot().silent().execute(message);
 
 	}
@@ -68,34 +61,10 @@ public class ActionControllerImpl implements ActionController {
 			sendMessageBuilder.text("You don't have any feeds.");
 		} else {
 			sendMessageBuilder.text("Your RSS feeds:")
-				.replyMarkup(createRssFeedListReplyMarkup(feeds));
+				.replyMarkup(replyMarkupFactory.createFeedListReplyMarkup(feeds));
 		}
 
 		return sendMessageBuilder.build();
-	}
-	
-	private InlineKeyboardMarkup createRssFeedListReplyMarkup(List<Feed> feeds) {
-		
-		// Pre: feeds is not empty
-		
-		InlineKeyboardMarkupBuilder markupInlineBuilder = InlineKeyboardMarkup.builder();
-		
-		List<List<InlineKeyboardButton>> feedRows = new ArrayList<>();
-		
-		for(Feed feed : feeds) {
-			
-			InlineKeyboardButton feedButton = buttonFactory.createShowFeedSettingsButton(feed.getTitle(), feed.getId());
-			
-			// Add the button to a new row
-			List<InlineKeyboardButton> feedRow = new ArrayList<>();
-			feedRow.add(feedButton);
-			feedRows.add(feedRow);
-			
-			markupInlineBuilder.keyboardRow(feedRow);
-		}
-		
-		
-		return markupInlineBuilder.build();
 	}
 
 	@Override
