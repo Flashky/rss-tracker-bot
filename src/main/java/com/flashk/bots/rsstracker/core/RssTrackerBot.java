@@ -9,7 +9,6 @@ import org.telegram.abilitybots.api.objects.Ability;
 import org.telegram.abilitybots.api.objects.Flag;
 import org.telegram.abilitybots.api.objects.Locality;
 import org.telegram.abilitybots.api.objects.Privacy;
-import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
@@ -74,16 +73,8 @@ public class RssTrackerBot extends AbilityCallbackBot {
 	              .input(0)
 	              .locality(Locality.USER)
 	              .privacy(Privacy.PUBLIC)
-	              .action(ctx -> {
-	            	  eventPublisher.publishCallbackQueryEvent(ctx.update().getCallbackQuery());
-	              })
-	              .post(ctx -> {
-	            	  AnswerCallbackQuery answerCallbackQuery = AnswerCallbackQuery.builder()
-	            			  .callbackQueryId(ctx.update().getCallbackQuery().getId())
-	            			  .build();
-	            	  
-	            	  this.execute(ctx.chatId(), answerCallbackQuery);
-	              })
+	              .action(ctx -> eventPublisher.publishCallbackQueryEvent(ctx.update().getCallbackQuery()))
+	              .post(actionController::answerCallbackQuery)
 	              .build();
 	}
 	

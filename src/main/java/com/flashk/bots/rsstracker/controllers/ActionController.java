@@ -13,4 +13,7 @@ public interface ActionController {
 
 	void showFeeds(MessageContext ctx);
 	void addFeed(BaseAbilityBot bot, Update update);
+	
+	// Callback queries
+	void answerCallbackQuery(MessageContext ctx);
 }
