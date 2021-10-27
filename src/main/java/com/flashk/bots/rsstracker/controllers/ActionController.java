@@ -15,5 +15,6 @@ public interface ActionController {
 	void addFeed(BaseAbilityBot bot, Update update);
 	
 	// Callback queries
+	void requestCallbackQuery(MessageContext ctx);
 	void answerCallbackQuery(MessageContext ctx);
 }

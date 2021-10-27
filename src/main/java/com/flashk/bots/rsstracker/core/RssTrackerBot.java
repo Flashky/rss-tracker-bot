@@ -13,16 +13,12 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
 import com.flashk.bots.rsstracker.controllers.ActionController;
-import com.flashk.bots.rsstracker.events.CallbackQueryEventPublisher;
 
 @Service
 public class RssTrackerBot extends AbilityCallbackBot {
 	
 	@Autowired
 	private ActionController actionController;
-	
-	@Autowired 
-	private CallbackQueryEventPublisher eventPublisher;
 	
 	@Value("${bot.creatorId}")
 	private Long creatorId;
@@ -73,7 +69,7 @@ public class RssTrackerBot extends AbilityCallbackBot {
 	              .input(0)
 	              .locality(Locality.USER)
 	              .privacy(Privacy.PUBLIC)
-	              .action(ctx -> eventPublisher.publishCallbackQueryEvent(ctx.update().getCallbackQuery()))
+	              .action(actionController::requestCallbackQuery)
 	              .post(actionController::answerCallbackQuery)
 	              .build();
 	}

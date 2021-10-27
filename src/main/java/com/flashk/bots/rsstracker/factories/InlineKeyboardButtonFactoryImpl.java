@@ -11,7 +11,7 @@ public class InlineKeyboardButtonFactoryImpl implements InlineKeyboardButtonFact
 		
 		return InlineKeyboardButton.builder()
 				.text(buttonText)
-				.callbackData("show/"+rssFeedId)
+				.callbackData("POST /feeds/"+rssFeedId+"/settings")
 				.build();
 		
 	}
@@ -21,7 +21,7 @@ public class InlineKeyboardButtonFactoryImpl implements InlineKeyboardButtonFact
 		
 		return InlineKeyboardButton.builder()
         		.text(buttonText)
-        		.callbackData("delete/"+rssFeedId)
+        		.callbackData("DELETE /feeds/"+rssFeedId)
         		.build();
 		
 	}
@@ -31,7 +31,7 @@ public class InlineKeyboardButtonFactoryImpl implements InlineKeyboardButtonFact
 
 		return InlineKeyboardButton.builder()
 				.text(buttonText)
-				.callbackData("confirm_delete/"+rssFeedId)
+				.callbackData("POST /feeds/"+rssFeedId+"/delete-confirmation")
 				.build();
 	}
 	
@@ -40,7 +40,7 @@ public class InlineKeyboardButtonFactoryImpl implements InlineKeyboardButtonFact
 
 		return InlineKeyboardButton.builder()
         		.text(buttonText)
-        		.callbackData("show_list")
+        		.callbackData("POST /feeds")
         		.build();
 
 	}
@@ -50,7 +50,7 @@ public class InlineKeyboardButtonFactoryImpl implements InlineKeyboardButtonFact
 
 		return InlineKeyboardButton.builder()
         		.text(buttonText)
-        		.callbackData("show_list?page="+String.valueOf(pageNumber))
+        		.callbackData("POST /feeds?page="+String.valueOf(pageNumber))
         		.build();
 
 	}
