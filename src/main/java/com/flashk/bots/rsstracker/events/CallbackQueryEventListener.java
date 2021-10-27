@@ -75,11 +75,11 @@ public class CallbackQueryEventListener {
 	@EventListener(condition = "#event.action eq 'delete'")
     public void onDeleteFeed(CallbackQueryEvent event) {
        
-		System.out.println("delete feed " +event.getRssFeedId());
+		System.out.println("confirm_delete feed " +event.getRssFeedId());
         
-		// TODO When trying to delete a non existing feed, throw an exception
-		// TODO At the exception handler, use an AnswerCallbackQuery using show_alert == true
-		// TODO More info: https://core.telegram.org/bots/api#answercallbackquery
+        // TODO When trying to delete a non existing feed, throw an exception
+        // TODO At the exception handler, use an AnswerCallbackQuery using show_alert == true
+        // TODO More info: https://core.telegram.org/bots/api#answercallbackquery
 		
 		// Remove the feed
         feedService.deleteFeed(event.getRssFeedId());
@@ -89,6 +89,16 @@ public class CallbackQueryEventListener {
         sendEditMessageReplyMarkup(event.getCallbackQuery(), menuBackToFeedList());
     }
 
+	@EventListener(condition = "#event.action eq 'confirm_delete'")
+    public void onConfirmDeleteFeed(CallbackQueryEvent event) {
+       
+		System.out.println("delete feed " +event.getRssFeedId());
+        
+        // Send message text and markup back to the user
+        sendEditMessageText(event.getCallbackQuery(), "Are you sure you want to delete the RSS feed?");
+        sendEditMessageReplyMarkup(event.getCallbackQuery(), menuConfirmDeleteFeed(event.getRssFeedId()));
+    }
+	
 	private InlineKeyboardMarkup menuBackToFeedList() {
 		
 		InlineKeyboardButton showListButton = InlineKeyboardButton.builder()
@@ -104,7 +114,29 @@ public class CallbackQueryEventListener {
         		.build();
 	}
 	
-    
+	private InlineKeyboardMarkup menuConfirmDeleteFeed(String rssFeedId) {
+		
+		InlineKeyboardButton confirmDelete = InlineKeyboardButton.builder()
+        		.text("Yes")
+        		.callbackData("delete/"+rssFeedId)
+        		.build();
+        
+		InlineKeyboardButton cancelDelete = InlineKeyboardButton.builder()
+        		.text("No")
+        		.callbackData("show/"+rssFeedId)
+        		.build();
+		
+        List<InlineKeyboardButton> optionsRow = new ArrayList<>();
+        optionsRow.add(confirmDelete);
+        optionsRow.add(cancelDelete);
+        
+        return InlineKeyboardMarkup.builder()
+        		.keyboardRow(optionsRow)
+        		.build();
+	}
+	
+
+	
     private void sendEditMessageText(CallbackQuery callbackQuery, String textMessage) {
 		
     	EditMessageText editMessageText = EditMessageText.builder()
@@ -172,7 +204,7 @@ public class CallbackQueryEventListener {
 		// Delete button
 		keyboardButton = InlineKeyboardButton.builder()
 				.text("Delete RSS feed")
-				.callbackData("delete/"+feed.getId())
+				.callbackData("confirm_delete/"+feed.getId())
 				.build();
 		
 		row.add(keyboardButton);
