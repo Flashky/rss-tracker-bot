@@ -9,7 +9,7 @@ import org.telegram.abilitybots.api.objects.Ability;
 import org.telegram.abilitybots.api.objects.Flag;
 import org.telegram.abilitybots.api.objects.Locality;
 import org.telegram.abilitybots.api.objects.Privacy;
-import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
+import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
@@ -30,11 +30,6 @@ public class RssTrackerBot extends AbilityCallbackBot {
 	
 	protected RssTrackerBot(@Value("${bot.token}")String botToken, @Value("${bot.username}") String botUsername) {
 		super(botToken, botUsername);	
-	}
-	
-	@Override
-	void onCallbackQuery(CallbackQuery callbackQuery) {
-		eventPublisher.publishCallbackQueryEvent(callbackQuery);
 	}
 	
 	public Ability showFeeds() {
@@ -66,6 +61,29 @@ public class RssTrackerBot extends AbilityCallbackBot {
 	            	Flag.REPLY,
 	            	isReplyToBot(),
 	            	isReplyToMessage("What RSS feed do you want to add?"))
+	              .build();
+	}
+	
+	@SuppressWarnings("unchecked")
+	public Ability handleCallbackQueries() {
+	    return Ability
+	              .builder()
+	              .name(DEFAULT)
+	              .flag(Flag.CALLBACK_QUERY)
+	              .info("Handle callback query")
+	              .input(0)
+	              .locality(Locality.USER)
+	              .privacy(Privacy.PUBLIC)
+	              .action(ctx -> {
+	            	  eventPublisher.publishCallbackQueryEvent(ctx.update().getCallbackQuery());
+	              })
+	              .post(ctx -> {
+	            	  AnswerCallbackQuery answerCallbackQuery = AnswerCallbackQuery.builder()
+	            			  .callbackQueryId(ctx.update().getCallbackQuery().getId())
+	            			  .build();
+	            	  
+	            	  this.execute(ctx.chatId(), answerCallbackQuery);
+	              })
 	              .build();
 	}
 	
