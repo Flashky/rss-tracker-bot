@@ -15,6 +15,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 
 import com.flashk.bots.rsstracker.core.RssTrackerBot;
+import com.flashk.bots.rsstracker.factories.InlineKeyboardButtonFactory;
 import com.flashk.bots.rsstracker.services.FeedService;
 import com.flashk.bots.rsstracker.services.model.Feed;
 
@@ -30,6 +31,10 @@ public class CallbackQueryEventListener {
 	
 	@Autowired
 	private FeedService feedService;
+	
+	@Autowired
+	private InlineKeyboardButtonFactory buttonFactory;
+	
 	
     @EventListener(condition = "#event.action eq 'show_list'")
     public void onShowFeeds(CallbackQueryEvent event) {
@@ -100,14 +105,9 @@ public class CallbackQueryEventListener {
     }
 	
 	private InlineKeyboardMarkup menuBackToFeedList() {
-		
-		InlineKeyboardButton showListButton = InlineKeyboardButton.builder()
-        		.text("<< Back to RSS Feed List")
-        		.callbackData("show_list")
-        		.build();
-        
+		    
         List<InlineKeyboardButton> optionsRow = new ArrayList<>();
-        optionsRow.add(showListButton);
+        optionsRow.add(buttonFactory.createShowFeedListButton("<< Back to RSS Feed List"));
         
         return InlineKeyboardMarkup.builder()
         		.keyboardRow(optionsRow)
@@ -116,19 +116,9 @@ public class CallbackQueryEventListener {
 	
 	private InlineKeyboardMarkup menuConfirmDeleteFeed(String rssFeedId) {
 		
-		InlineKeyboardButton confirmDelete = InlineKeyboardButton.builder()
-        		.text("Yes")
-        		.callbackData("delete/"+rssFeedId)
-        		.build();
-        
-		InlineKeyboardButton cancelDelete = InlineKeyboardButton.builder()
-        		.text("No")
-        		.callbackData("show/"+rssFeedId)
-        		.build();
-		
         List<InlineKeyboardButton> optionsRow = new ArrayList<>();
-        optionsRow.add(confirmDelete);
-        optionsRow.add(cancelDelete);
+        optionsRow.add(buttonFactory.createDeleteFeedButton("Yes", rssFeedId));
+        optionsRow.add(buttonFactory.createShowFeedSettingsButton("No", rssFeedId));
         
         return InlineKeyboardMarkup.builder()
         		.keyboardRow(optionsRow)
@@ -170,10 +160,7 @@ public class CallbackQueryEventListener {
 		
 		for(Feed feed : feeds) {
 			
-			InlineKeyboardButton feedButton = InlineKeyboardButton.builder()
-					.text(feed.getTitle())
-					.callbackData("show/"+feed.getId())
-					.build();
+			InlineKeyboardButton feedButton = buttonFactory.createShowFeedSettingsButton(feed.getTitle(), feed.getId());
 			
 			// Add the button to a new row
 			List<InlineKeyboardButton> feedRow = new ArrayList<>();
@@ -201,23 +188,14 @@ public class CallbackQueryEventListener {
 		
 		row.add(keyboardButton);
 		
-		// Delete button
-		keyboardButton = InlineKeyboardButton.builder()
-				.text("Delete RSS feed")
-				.callbackData("confirm_delete/"+feed.getId())
-				.build();
-		
-		row.add(keyboardButton);
+		// Delete button		
+		row.add(buttonFactory.createDeleteFeedConfirmationButton("Delete RSS Feed", feed.getId()));
 		markupInlineBuilder.keyboardRow(row);
 		
 		// Back to main menu
 		row = new ArrayList<>();
-		keyboardButton = InlineKeyboardButton.builder()
-				.text("<< Back to RSS Feed List")
-				.callbackData("show_list")
-				.build();
+		row.add(buttonFactory.createShowFeedListButton("<< Back to RSS Feed List"));
 		
-		row.add(keyboardButton);
 		markupInlineBuilder.keyboardRow(row);
 		
 		return markupInlineBuilder.build();

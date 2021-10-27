@@ -15,6 +15,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup.InlineKeyboardMarkupBuilder;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 
+import com.flashk.bots.rsstracker.factories.InlineKeyboardButtonFactory;
 import com.flashk.bots.rsstracker.services.FeedService;
 import com.flashk.bots.rsstracker.services.model.Feed;
 
@@ -23,6 +24,9 @@ public class ActionControllerImpl implements ActionController {
 
 	@Autowired
 	private FeedService feedService;
+	
+	@Autowired
+	private InlineKeyboardButtonFactory buttonFactory;
 	
 	@Override
 	public void showFeeds(MessageContext ctx) {
@@ -80,10 +84,7 @@ public class ActionControllerImpl implements ActionController {
 		
 		for(Feed feed : feeds) {
 			
-			InlineKeyboardButton feedButton = InlineKeyboardButton.builder()
-					.text(feed.getTitle())
-					.callbackData("show/"+feed.getId())
-					.build();
+			InlineKeyboardButton feedButton = buttonFactory.createShowFeedSettingsButton(feed.getTitle(), feed.getId());
 			
 			// Add the button to a new row
 			List<InlineKeyboardButton> feedRow = new ArrayList<>();
