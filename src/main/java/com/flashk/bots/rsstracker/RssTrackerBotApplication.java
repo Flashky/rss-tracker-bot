@@ -7,9 +7,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class RssTrackerBotApplication {
 
 	public static void main(String[] args) {
-		
-		//ApiContextInitializer.init();
-		
 		SpringApplication.run(RssTrackerBotApplication.class, args);
 	}
 
