@@ -39,11 +39,13 @@ public class FeedController implements TelegramMvcController {
     @MessageRequest(value = "/newfeed" )
     public SendMessage addFeed(User user, Chat chat) {
     	
-    	ForceReply forceReply = new ForceReply()
-    			.inputFieldPlaceholder("https://your-rss-feed-url");
+    	ForceReply forceReply = new ForceReply().inputFieldPlaceholder("https://your-rss-feed-url");
     	
-    	return new SendMessage(chat.id(), messageSource.getMessage(MessageCode.RSS_FEED_ADD, null, Locale.ENGLISH))
-    			.replyMarkup(forceReply);
+    	String addFeedText = messageSource.getMessage(MessageCode.RSS_FEED_ADD, 
+    													null, 
+    													Locale.forLanguageTag(user.languageCode()));
+    	
+    	return new SendMessage(chat.id(), addFeedText).replyMarkup(forceReply);
     	
     }
     
@@ -56,7 +58,9 @@ public class FeedController implements TelegramMvcController {
     		return;
     	}
     	
-		if(messageSource.getMessage(MessageCode.RSS_FEED_ADD, null, Locale.ENGLISH).equals(replyToMessage.text())) {
+		if(messageSource.getMessage(MessageCode.RSS_FEED_ADD, 
+									null, 
+									Locale.forLanguageTag(request.getUser().languageCode())).equals(replyToMessage.text())) {
 			createFeed(request);
 		}
 
@@ -72,9 +76,10 @@ public class FeedController implements TelegramMvcController {
 											request.getChat().id(), 
 											request.getMessage().text());
 		
-		request.getTelegramBot().execute(new SendMessage(request.getChat().id(), 
-															messageSource.getMessage(MessageCode.RSS_FEED_ADDED, 
-																					new Object[] { feed.getTitle() }, 
-																					Locale.ENGLISH)));
+		String feedCreatedMessage = messageSource.getMessage(MessageCode.RSS_FEED_ADDED, 
+																new Object[] { feed.getTitle() }, 
+																Locale.forLanguageTag(request.getUser().languageCode()));
+	
+		request.getTelegramBot().execute(new SendMessage(request.getChat().id(), feedCreatedMessage));
 	}
 }
