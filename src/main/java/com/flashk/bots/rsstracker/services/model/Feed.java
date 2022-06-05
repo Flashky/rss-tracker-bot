@@ -7,6 +7,8 @@ import lombok.Setter;
 @Setter
 public class Feed {
 	private String id;
-	private String url;
+	private String sourceLink;
 	private String title;
+	private String description;
+	private String link;
 }
