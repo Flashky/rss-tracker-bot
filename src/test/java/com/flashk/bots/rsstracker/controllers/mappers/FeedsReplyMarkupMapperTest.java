@@ -21,7 +21,7 @@ class FeedsReplyMarkupMapperTest {
 
 	private static PodamFactory podamFactory;
 	
-	private FeedsReplyMarkupMapper feedReplyMarkupMapper = new FeedsReplyMarkupMapperImpl();
+	private FeedsReplyMarkupMapper feedReplyMarkupMapper = new FeedsReplyMarkupMapper();
 	
 	@BeforeAll
 	static void setUpBeforeClass() throws Exception {
