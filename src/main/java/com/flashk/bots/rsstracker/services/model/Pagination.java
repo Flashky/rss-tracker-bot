@@ -32,4 +32,22 @@ public class Pagination {
 		
 	}
 	
+	/**
+	 * Indicates if the current page is the first or not.
+	 * This method acts as a shortcut of <code>pagination.getPreviousPage().isEmpty()</code>.
+	 * @return true if it is the first page. False in other case.
+	 */
+	public boolean isFirst() {
+		return previousPage.isEmpty();
+	}
+	
+	/**
+	 * Indicates if the current page is the last page or not.
+	 * This method acts as a shortcat of <code>pagination.getNextPage().isEmpty()</code>.
+	 * @return true if it is the last page. False in other case.
+	 */
+	public boolean isLast() {
+		return nextPage.isEmpty();
+	}
+	
 }

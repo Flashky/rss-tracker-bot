@@ -59,7 +59,7 @@ class PaginationTest {
 		assertNotNull(result);
 		assertEquals(page, result.getPage());
 		assertFalse(result.getPreviousPage().isPresent());
-		
+		assertTrue(result.isFirst());
 	}
 
 	@Test
@@ -78,6 +78,7 @@ class PaginationTest {
 		assertNotNull(result);
 		assertEquals(page, result.getPage());
 		assertFalse(result.getNextPage().isPresent());
+		assertTrue(result.isLast());
 	}
 
 }
