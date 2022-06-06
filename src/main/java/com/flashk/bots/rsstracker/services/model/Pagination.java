@@ -25,15 +25,11 @@ public class Pagination {
 		
 		this.page = page;
 		this.previousPage = (page > FIRST_PAGE) ? Optional.of(page - PAGE_INCREMENT) : Optional.empty();
-		this.nextPage = (page < totalPages-1) ? Optional.of(page + PAGE_INCREMENT) : Optional.empty();
+		this.nextPage = (page < totalPages - PAGE_INCREMENT) ? Optional.of(page + PAGE_INCREMENT) : Optional.empty();
 		this.size = size;
 		this.totalElements = totalElements;
 		this.totalPages = totalPages;	
 		
-	}
-	
-	public boolean isLastPage() {
-		return !nextPage.isPresent();
 	}
 	
 }

@@ -2,7 +2,6 @@ package com.flashk.bots.rsstracker.services;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -18,7 +17,6 @@ import com.flashk.bots.rsstracker.services.exceptions.InvalidRssException;
 import com.flashk.bots.rsstracker.services.mappers.FeedMapper;
 import com.flashk.bots.rsstracker.services.model.Feed;
 import com.flashk.bots.rsstracker.services.model.PagedResponse;
-import com.flashk.bots.rsstracker.services.model.Pagination;
 import com.rometools.rome.feed.synd.SyndFeed;
 import com.rometools.rome.io.FeedException;
 import com.rometools.rome.io.SyndFeedInput;
@@ -68,22 +66,8 @@ public class FeedServiceImpl implements FeedService {
 		Pageable pageable = PageRequest.of(page, size);
 		
 		Page<FeedEntity> feedEntitiesPage = feedRepository.findByTelegramUserId(userId, pageable);
-
 		
-		// TODO refactor into a mapper
-		// Map data and pagination objects
-		List<Feed> feeds = feedMapper.map(feedEntitiesPage.getContent());
-
-		Pagination pagination = new Pagination(feedEntitiesPage.getNumber(), 
-												feedEntitiesPage.getSize(), 
-												feedEntitiesPage.getTotalElements(), 
-												feedEntitiesPage.getTotalPages());
-		
-		PagedResponse<Feed> pagedResponse = new PagedResponse<>();
-		pagedResponse.setData(feeds);
-		pagedResponse.setPagination(pagination);
-		
-		return pagedResponse;
+		return feedMapper.map(feedEntitiesPage);
 	}
 	
 	private SyndFeed readRss(String feedUrl) {
