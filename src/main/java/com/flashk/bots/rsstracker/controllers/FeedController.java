@@ -1,18 +1,17 @@
 package com.flashk.bots.rsstracker.controllers;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 
 import com.flashk.bots.rsstracker.constants.MessageCode;
+import com.flashk.bots.rsstracker.controllers.mappers.FeedsReplyMarkupMapper;
 import com.flashk.bots.rsstracker.services.FeedService;
 import com.flashk.bots.rsstracker.services.model.Feed;
 import com.flashk.bots.rsstracker.services.model.PagedResponse;
-import com.flashk.bots.rsstracker.services.model.Pagination;
 import com.github.kshashov.telegram.api.TelegramMvcController;
 import com.github.kshashov.telegram.api.TelegramRequest;
 import com.github.kshashov.telegram.api.bind.annotation.BotController;
@@ -24,7 +23,6 @@ import com.pengrad.telegrambot.model.Chat;
 import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.User;
 import com.pengrad.telegrambot.model.request.ForceReply;
-import com.pengrad.telegrambot.model.request.InlineKeyboardButton;
 import com.pengrad.telegrambot.model.request.InlineKeyboardMarkup;
 import com.pengrad.telegrambot.request.AnswerCallbackQuery;
 import com.pengrad.telegrambot.request.EditMessageText;
@@ -42,6 +40,9 @@ public class FeedController implements TelegramMvcController {
     @Autowired
     private FeedService feedService;
     
+    @Autowired
+    private FeedsReplyMarkupMapper feedsReplyMarkupMapper;
+    
 	@Override
 	public String getToken() {
 		return token;
@@ -50,51 +51,18 @@ public class FeedController implements TelegramMvcController {
 	@MessageRequest(value = "/myfeeds") 
 	public SendMessage listFeeds(User user, Chat chat) {
 		
+		// Obtain feeds
 		PagedResponse<Feed> feeds = feedService.listFeeds(user.id(), 0, 15);
 		
-		if(feeds.isEmpty()) {
+		// Prepare response
+		Optional<InlineKeyboardMarkup> replyMarkup = feedsReplyMarkupMapper.map(feeds);
+		
+		if(replyMarkup.isEmpty()) {
     		return new SendMessage(chat.id(), "You don't have any feeds.");
     	} else {
-    		
-    		// TODO Inicio refactorización a mapper: PagedResponse<Feed> -> InlineKeyboardMarkup
-    		InlineKeyboardMarkup replyMarkup = new InlineKeyboardMarkup();
-    		
-    		for(Feed feed : feeds.getData()) {
-    			
-    			InlineKeyboardButton button = new InlineKeyboardButton(feed.getTitle())
-    					.callbackData("/feeds/"+feed.getId()+"?action=show");
-    			
-    			replyMarkup.addRow(button);
-    		}
-    		
-    		List<InlineKeyboardButton> paginationButtons = new ArrayList<>();
-    		Pagination pagination = feeds.getPagination();
-    		int size = pagination.getSize();
-    		
-    		if(pagination.getPreviousPage().isPresent()) {
-    			
-    			InlineKeyboardButton button = new InlineKeyboardButton("<<")
-    													.callbackData("/feeds?page="+pagination.getPreviousPage().get()+"&size="+size);
-    			
-    			paginationButtons.add(button);
-    		}
-    		
-    		if(pagination.getNextPage().isPresent()) {
-    			
-    			InlineKeyboardButton button = new InlineKeyboardButton(">>")
-						.callbackData("/feeds?page="+pagination.getNextPage().get()+"&size="+size);
-    			
-    			paginationButtons.add(button);
-    		}
-    		
-    		InlineKeyboardButton[] paginationButtonsArray = new InlineKeyboardButton[paginationButtons.size()];
-    		paginationButtons.toArray(paginationButtonsArray);
-    		replyMarkup.addRow(paginationButtonsArray);
-    		
-    		// TODO Fin refactorización a mapper
-    		
-    		SendMessage  feedsMessage = new SendMessage(chat.id(), "Your RSS feeds:")
-    				.replyMarkup(replyMarkup);
+
+    		SendMessage feedsMessage = new SendMessage(chat.id(), "Your RSS feeds:")
+    									.replyMarkup(replyMarkup.get());
   
     		return feedsMessage;
     	}
@@ -108,57 +76,23 @@ public class FeedController implements TelegramMvcController {
     	User user = request.getUser();
     	Chat chat = request.getChat();
     	
-    	CallbackQuery callbackQuery = request.getUpdate().callbackQuery();
-    	int callbackQueryMessageId = callbackQuery.message().messageId();
-    	
     	// Answer callback query
+    	CallbackQuery callbackQuery = request.getUpdate().callbackQuery();
     	request.getTelegramBot().execute(new AnswerCallbackQuery(callbackQuery.id()));
+
     	
     	// Obtain feeds
     	PagedResponse<Feed> feeds = feedService.listFeeds(user.id(), page, size);
     	
-    	if(feeds.isEmpty()) {
-    		return new EditMessageText(chat.id(), callbackQueryMessageId, "You don't have any feeds.");
+    	// Prepare response
+    	Optional<InlineKeyboardMarkup> replyMarkup = feedsReplyMarkupMapper.map(feeds);
+    	
+    	if(replyMarkup.isEmpty()) {
+    		return new EditMessageText(chat.id(), callbackQuery.message().messageId(), "You don't have any feeds.");
     	} else {
     		
-    		// TODO Inicio refactorización a mapper: PagedResponse<Feed> -> InlineKeyboardMarkup
-    		InlineKeyboardMarkup replyMarkup = new InlineKeyboardMarkup();
-    		
-    		for(Feed feed : feeds.getData()) {
-    			
-    			InlineKeyboardButton button = new InlineKeyboardButton(feed.getTitle())
-    					.callbackData("/feeds/"+feed.getId()+"?action=show");
-    			
-    			replyMarkup.addRow(button);
-    		}
-    		
-    		List<InlineKeyboardButton> paginationButtons = new ArrayList<>();
-    		Pagination pagination = feeds.getPagination();
-    		
-    		if(feeds.getPagination().getPreviousPage().isPresent()) {
-    			
-    			InlineKeyboardButton button = new InlineKeyboardButton("<<")
-    													.callbackData("/feeds?page="+pagination.getPreviousPage().get()+"&size="+size);
-    			
-    			paginationButtons.add(button);
-    		}
-    		
-    		if(pagination.getNextPage().isPresent()) {
-    			
-    			InlineKeyboardButton button = new InlineKeyboardButton(">>")
-						.callbackData("/feeds?page="+pagination.getNextPage().get()+"&size="+size);
-    			
-    			paginationButtons.add(button);
-    		}
-    		
-    		InlineKeyboardButton[] paginationButtonsArray = new InlineKeyboardButton[paginationButtons.size()];
-    		paginationButtons.toArray(paginationButtonsArray);
-    		replyMarkup.addRow(paginationButtonsArray);
-    		
-    		// TODO Fin refactorización a mapper
-    		
-    		EditMessageText feedsMessage = new EditMessageText(chat.id(), callbackQueryMessageId, "Your RSS feeds:")
-    				.replyMarkup(replyMarkup);
+    		EditMessageText feedsMessage = new EditMessageText(chat.id(),  callbackQuery.message().messageId(), "Your RSS feeds:")
+    				.replyMarkup(replyMarkup.get());
   
     		return feedsMessage;
     	}
