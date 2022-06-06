@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
 import com.flashk.bots.rsstracker.constants.MessageConstants;
+import com.flashk.bots.rsstracker.controllers.constants.Constants;
 import com.flashk.bots.rsstracker.controllers.constants.PathConstants;
 import com.flashk.bots.rsstracker.controllers.mappers.FeedsReplyMarkupMapper;
 import com.flashk.bots.rsstracker.services.FeedService;
@@ -34,6 +35,9 @@ public class FeedController implements TelegramMvcController {
     @Value("${bot.token}")
     private String token;
     
+    @Value("${bot.feeds.page-size}")
+    private int pageSize;
+    
     @Autowired
     private FeedService feedService;
     
@@ -48,11 +52,11 @@ public class FeedController implements TelegramMvcController {
 		return token;
 	}
     
-	@MessageRequest(value = "/myfeeds") 
+	@MessageRequest("/myfeeds") 
 	public SendMessage listFeeds(User user, Chat chat) {
 		
 		// Obtain feeds
-		PagedResponse<Feed> feeds = feedService.listFeeds(user.id(), 0, 15);
+		PagedResponse<Feed> feeds = feedService.listFeeds(user.id(), Constants.FIRST_PAGE, pageSize);
 		
 		// Prepare response
 		Optional<InlineKeyboardMarkup> replyMarkup = feedsReplyMarkupMapper.map(feeds);
@@ -72,8 +76,10 @@ public class FeedController implements TelegramMvcController {
 	
 	}
 	
-    @CallbackQueryRequest(value = PathConstants.FEEDS_URI)
-    public EditMessageText listFeedsCallback(TelegramRequest request, @BotPathVariable("page") Integer page, @BotPathVariable("size") Integer size) {
+    @CallbackQueryRequest(PathConstants.URI_FEEDS)
+    public EditMessageText listFeedsCallback(TelegramRequest request, 
+    											@BotPathVariable(PathConstants.QUERY_PAGE) Integer page, 
+    											@BotPathVariable(PathConstants.QUERY_SIZE) Integer size) {
     	
     	User user = request.getUser();
     	Chat chat = request.getChat();
@@ -107,7 +113,7 @@ public class FeedController implements TelegramMvcController {
     }
 	
 	
-    @MessageRequest(value = "/newfeed" )
+    @MessageRequest("/newfeed" )
     public SendMessage addFeed(User user, Chat chat) {
     	
     	ForceReply forceReply = new ForceReply().inputFieldPlaceholder("https://your-rss-feed-url");

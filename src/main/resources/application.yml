@@ -12,3 +12,5 @@ spring:
       
 bot:
   token: ${TELEGRAM_BOT_TOKEN}
+  feeds: 
+    page-size: ${FEEDS_PAGE_SIZE:15}
