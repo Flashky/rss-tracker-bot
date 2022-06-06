@@ -1,5 +1,7 @@
 package com.flashk.bots.rsstracker.services;
 
+import java.util.Optional;
+
 import com.flashk.bots.rsstracker.services.model.Feed;
 import com.flashk.bots.rsstracker.services.model.PagedResponse;
 
@@ -10,7 +12,7 @@ public interface FeedService {
 	 * @param userId telegram unique user identifier and owner of the feed.
 	 * @param chatId telegram unique chat identifier between user and bot.
 	 * @param feedUrl feed to be created for the user.
-	 * @return the created feed
+	 * @return the created feed.
 	 */
 	Feed createFeed(Long userId, Long chatId, String feedUrl);
 	
@@ -22,4 +24,11 @@ public interface FeedService {
 	 * @return a page of feeds.
 	 */
 	PagedResponse<Feed> listFeeds(Long userId, int page, int size);
+	
+	/**
+	 * Retrieve a single feed.
+	 * @param feedId unique feed identifier.
+	 * @return a feed.
+	 */
+	Optional<Feed> getFeed(String feedId);
 }

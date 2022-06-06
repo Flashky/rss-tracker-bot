@@ -17,6 +17,23 @@ public class Pagination {
 	private long totalElements;
 	private long totalPages;
 	
+	public Pagination(int page, int size, long totalElements) {
+	
+		if(page < FIRST_PAGE) {
+			throw new IllegalArgumentException("Page cannot be less than zero.");
+		}
+		
+		this.page = page;
+		this.size = size;
+		this.totalElements = totalElements;
+		
+		// Calculated elements
+		this.totalPages = totalElements / size;
+		this.previousPage = (page > FIRST_PAGE) ? Optional.of(page - PAGE_INCREMENT) : Optional.empty();
+		this.nextPage = (page < totalPages - PAGE_INCREMENT) ? Optional.of(page + PAGE_INCREMENT) : Optional.empty();
+		
+	}
+	
 	public Pagination(int page, int size, long totalElements, long totalPages) {
 		
 		if(page < FIRST_PAGE) {
@@ -24,11 +41,13 @@ public class Pagination {
 		}
 		
 		this.page = page;
-		this.previousPage = (page > FIRST_PAGE) ? Optional.of(page - PAGE_INCREMENT) : Optional.empty();
-		this.nextPage = (page < totalPages - PAGE_INCREMENT) ? Optional.of(page + PAGE_INCREMENT) : Optional.empty();
 		this.size = size;
 		this.totalElements = totalElements;
 		this.totalPages = totalPages;	
+		
+		// Calculated values
+		this.previousPage = (page > FIRST_PAGE) ? Optional.of(page - PAGE_INCREMENT) : Optional.empty();
+		this.nextPage = (page < totalPages - PAGE_INCREMENT) ? Optional.of(page + PAGE_INCREMENT) : Optional.empty();
 		
 	}
 	

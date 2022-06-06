@@ -2,6 +2,7 @@ package com.flashk.bots.rsstracker.services;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -33,7 +34,6 @@ public class FeedServiceImpl implements FeedService {
 	private FeedMapper feedMapper;
 	
 	@Override
-	@Validated
 	public Feed createFeed(Long userId, Long chatId, String feedUrl) {
 		
 		// Obtain feed data
@@ -70,6 +70,20 @@ public class FeedServiceImpl implements FeedService {
 		return feedMapper.map(feedEntitiesPage);
 	}
 	
+	@Override
+	public Optional<Feed> getFeed(String feedId) {
+
+		Optional<FeedEntity> feedEntity = feedRepository.findById(feedId);
+		
+		if(feedEntity.isPresent()) {
+			Feed feed = feedMapper.map(feedEntity.get());
+			return Optional.ofNullable(feed);
+		} else {
+			return Optional.empty();
+		}
+
+	}
+	
 	private SyndFeed readRss(String feedUrl) {
 		
 		try {
@@ -83,6 +97,8 @@ public class FeedServiceImpl implements FeedService {
 		}
 		
 	}
+
+
 
 
 

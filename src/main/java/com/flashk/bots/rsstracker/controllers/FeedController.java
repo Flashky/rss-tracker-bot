@@ -107,7 +107,32 @@ public class FeedController implements TelegramMvcController {
     	}
     	
     }
-	
+    
+    @CallbackQueryRequest(PathConstants.URI_FEED_SHOW)
+    public EditMessageText getFeed(TelegramRequest request, @BotPathVariable(PathConstants.FEED_ID) String feedId) {
+    	
+    	User user = request.getUser();
+    	Chat chat = request.getChat();
+    	
+    	// Answer callback query
+    	CallbackQuery callbackQuery = request.getUpdate().callbackQuery();
+    	request.getTelegramBot().execute(new AnswerCallbackQuery(callbackQuery.id()));
+    	
+    	// Obtain feed
+    	Optional<Feed> feed = feedService.getFeed(feedId);
+    	
+    	// Prepare response
+    	
+    	if(feed.isEmpty()) {
+    		return new EditMessageText(chat.id(), callbackQuery.message().messageId(), "Sorry, I couldn't find that feed.");
+    	} else {
+    		
+    		
+    	}
+    	
+    	return null;
+    	
+    }
 	
     @MessageRequest("/newfeed" )
     public SendMessage addFeed(User user, Chat chat) {

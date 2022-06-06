@@ -1,5 +1,6 @@
 package com.flashk.bots.rsstracker.services.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.util.CollectionUtils;
@@ -13,7 +14,7 @@ import lombok.Setter;
 @Setter
 public class PagedResponse<T> {
 
-	private List<T> data;
+	private List<T> data = new ArrayList<>();
 	private Pagination pagination;
 	
 	@JsonIgnore
