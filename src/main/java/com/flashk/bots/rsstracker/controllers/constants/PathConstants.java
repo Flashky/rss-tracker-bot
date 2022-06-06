@@ -15,6 +15,8 @@ public final class PathConstants {
 	public static final String URI_FEED_SHOW = "/feeds/{feedId}?action=show";
 	
 	public static final String URI_FEEDS = "/feeds?page={page}&size={size}";
+	public static final String URI_FEED_ITEMS = "/feeds/{feedId}/items?page={page}&size={size}";
+	
 	
 	private PathConstants() {}
 }

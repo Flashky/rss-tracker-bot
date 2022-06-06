@@ -9,9 +9,12 @@ import com.flashk.bots.rsstracker.constants.MessageConstants;
 import com.flashk.bots.rsstracker.controllers.constants.Constants;
 import com.flashk.bots.rsstracker.controllers.constants.PathConstants;
 import com.flashk.bots.rsstracker.controllers.mappers.FeedsReplyMarkupMapper;
+import com.flashk.bots.rsstracker.controllers.mappers.ItemsReplyMarkupMapper;
 import com.flashk.bots.rsstracker.services.FeedService;
+import com.flashk.bots.rsstracker.services.ItemService;
 import com.flashk.bots.rsstracker.services.LocalizedMessageService;
 import com.flashk.bots.rsstracker.services.model.Feed;
+import com.flashk.bots.rsstracker.services.model.Item;
 import com.flashk.bots.rsstracker.services.model.PagedResponse;
 import com.github.kshashov.telegram.api.TelegramMvcController;
 import com.github.kshashov.telegram.api.TelegramRequest;
@@ -42,7 +45,13 @@ public class FeedController implements TelegramMvcController {
     private FeedService feedService;
     
     @Autowired
+    private ItemService itemService;
+    
+    @Autowired
     private LocalizedMessageService messageService;
+    
+    @Autowired
+    private ItemsReplyMarkupMapper itemsReplyMarkupMapper;
     
     @Autowired
     private FeedsReplyMarkupMapper feedsReplyMarkupMapper;
@@ -108,29 +117,37 @@ public class FeedController implements TelegramMvcController {
     	
     }
     
-    @CallbackQueryRequest(PathConstants.URI_FEED_SHOW)
-    public EditMessageText getFeed(TelegramRequest request, @BotPathVariable(PathConstants.FEED_ID) String feedId) {
+    @CallbackQueryRequest(PathConstants.URI_FEED_ITEMS)
+    public EditMessageText listFeedItems(TelegramRequest request, 
+    										@BotPathVariable(PathConstants.FEED_ID) String feedId, 
+											@BotPathVariable(PathConstants.QUERY_PAGE) Integer page, 
+											@BotPathVariable(PathConstants.QUERY_SIZE) Integer size) {
     	
-    	User user = request.getUser();
     	Chat chat = request.getChat();
-    	
-    	// Answer callback query
     	CallbackQuery callbackQuery = request.getUpdate().callbackQuery();
-    	request.getTelegramBot().execute(new AnswerCallbackQuery(callbackQuery.id()));
     	
     	// Obtain feed
     	Optional<Feed> feed = feedService.getFeed(feedId);
     	
-    	// Prepare response
-    	
     	if(feed.isEmpty()) {
     		return new EditMessageText(chat.id(), callbackQuery.message().messageId(), "Sorry, I couldn't find that feed.");
-    	} else {
-    		
-    		
     	}
     	
-    	return null;
+    	
+    	PagedResponse<Item> items = itemService.listItems(feed.get().getSourceLink(), page, size);
+
+    	// Answer callback query
+    	request.getTelegramBot().execute(new AnswerCallbackQuery(callbackQuery.id()));
+    	
+    	// Prepare response
+    	Optional<InlineKeyboardMarkup> replyMarkup = itemsReplyMarkupMapper.map(feed.get(), items);
+    	
+    	if(replyMarkup.isEmpty()) {
+    		return new EditMessageText(chat.id(), callbackQuery.message().messageId(), "There are no items on this feed yet");
+    	} else {
+    		return new EditMessageText(chat.id(), callbackQuery.message().messageId(), feed.get().getTitle())
+    				.replyMarkup(replyMarkup.get());
+    	}
     	
     }
 	

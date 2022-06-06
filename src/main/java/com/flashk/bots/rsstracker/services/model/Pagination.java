@@ -42,7 +42,7 @@ public class Pagination {
 		
 		this.page = page;
 		this.size = size;
-		this.totalElements = totalElements;
+		this.totalElements = totalElements; 
 		this.totalPages = totalPages;	
 		
 		// Calculated values

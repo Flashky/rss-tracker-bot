@@ -26,6 +26,7 @@ public abstract class FeedMapper {
 		
 		PagedResponse<Feed> pagedResponse = new PagedResponse<>();
 		
+		// No data
 		if(feedEntitiesPage == null || feedEntitiesPage.isEmpty()) {
 			pagedResponse.setData(new ArrayList<>());
 			return pagedResponse;

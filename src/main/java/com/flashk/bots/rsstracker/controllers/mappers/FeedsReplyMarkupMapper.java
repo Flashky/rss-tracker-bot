@@ -45,7 +45,7 @@ public abstract class FeedsReplyMarkupMapper {
 		for(Feed feed : feedData) {
 			
 			InlineKeyboardButton button = new InlineKeyboardButton(feed.getTitle())
-											.callbackData(getFeedUri(feed.getId(), Constants.ACTION_SHOW));
+											.callbackData(getFeedItemsUri(feed.getId()));
 			
 			replyMarkup.addRow(button);
 			
@@ -81,10 +81,9 @@ public abstract class FeedsReplyMarkupMapper {
 		replyMarkup.addRow(paginationButtonsArray);
 	}
 	
-	private String getFeedUri(String feedId, String action) {
-		return UriComponentsBuilder.fromPath(PathConstants.URI_FEED)
-									.queryParam(PathConstants.QUERY_ACTION, action)
-									.buildAndExpand(feedId, action)
+	private String getFeedItemsUri(String feedId) {
+		return UriComponentsBuilder.fromPath(PathConstants.URI_FEED_ITEMS)
+									.buildAndExpand(feedId,Constants.FIRST_PAGE, 2)
 									.toString();
 	}
 	
