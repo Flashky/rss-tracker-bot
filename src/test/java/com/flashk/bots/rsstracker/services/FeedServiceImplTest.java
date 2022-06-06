@@ -10,11 +10,8 @@ import java.util.List;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mockito;
 import org.mockito.Spy;
@@ -54,19 +51,12 @@ class FeedServiceImplTest {
 	@Spy
 	private FeedRepository feedRepository;
 	
-	@Captor
-	private ArgumentCaptor<FeedEntity> feedEntityCaptor;
-	
 	@BeforeAll
 	static void setUpBeforeClass() throws Exception {
 		
 	    podamFactory = new PodamFactoryImpl();
 	    podamFactory.getStrategy().setDefaultNumberOfCollectionElements(2);
 	    
-	}
-
-	@BeforeEach
-	void setUp() throws Exception {
 	}
 
 	@Test

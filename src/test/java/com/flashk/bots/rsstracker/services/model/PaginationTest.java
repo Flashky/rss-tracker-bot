@@ -1,9 +1,11 @@
 package com.flashk.bots.rsstracker.services.model;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class PaginationTest {
@@ -13,10 +15,6 @@ class PaginationTest {
 	
 	@BeforeAll
 	static void setUpBeforeClass() throws Exception {
-	}
-
-	@BeforeEach
-	void setUp() throws Exception {
 	}
 
 	@Test

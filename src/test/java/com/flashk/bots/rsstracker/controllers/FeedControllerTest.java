@@ -15,7 +15,6 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.MessageSource;
 
-import com.flashk.bots.rsstracker.services.FeedService;
 import com.pengrad.telegrambot.model.Chat;
 import com.pengrad.telegrambot.model.User;
 import com.pengrad.telegrambot.request.SendMessage;
@@ -34,9 +33,6 @@ class FeedControllerTest {
 	
 	@Mock
 	private MessageSource messageSource;
-	
-    @Mock
-    private FeedService feedService;
     
 	@BeforeAll
 	static void setUpBeforeClass() throws Exception {

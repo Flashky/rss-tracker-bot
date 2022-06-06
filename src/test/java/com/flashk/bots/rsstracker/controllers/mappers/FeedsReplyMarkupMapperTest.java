@@ -16,6 +16,7 @@ import com.pengrad.telegrambot.model.request.InlineKeyboardMarkup;
 import uk.co.jemos.podam.api.PodamFactory;
 import uk.co.jemos.podam.api.PodamFactoryImpl;
 
+@SuppressWarnings("unchecked")
 class FeedsReplyMarkupMapperTest {
 
 	private static PodamFactory podamFactory;
