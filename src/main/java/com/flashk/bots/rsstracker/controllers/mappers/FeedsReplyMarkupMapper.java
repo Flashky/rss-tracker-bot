@@ -5,7 +5,9 @@ import java.util.List;
 import java.util.Optional;
 
 import org.mapstruct.Mapper;
+import org.springframework.web.util.UriComponentsBuilder;
 
+import com.flashk.bots.rsstracker.controllers.constants.PathConstants;
 import com.flashk.bots.rsstracker.services.model.Feed;
 import com.flashk.bots.rsstracker.services.model.PagedResponse;
 import com.flashk.bots.rsstracker.services.model.Pagination;
@@ -42,7 +44,7 @@ public class FeedsReplyMarkupMapper {
 		for(Feed feed : feedData) {
 			
 			InlineKeyboardButton button = new InlineKeyboardButton(feed.getTitle())
-											.callbackData("/feeds/"+feed.getId()+"?action=show");
+											.callbackData(getFeedUri(feed.getId(), "show"));
 			
 			replyMarkup.addRow(button);
 			
@@ -60,16 +62,14 @@ public class FeedsReplyMarkupMapper {
 		
 		if(!pagination.isFirst()) {
 			
-			InlineKeyboardButton button = new InlineKeyboardButton("<<")
-													.callbackData("/feeds?page="+pagination.getPreviousPage().get()+"&size="+pagination.getSize());
-			
+			InlineKeyboardButton button = new InlineKeyboardButton("<<").callbackData(getFeedsUri(pagination.getPreviousPage().get(), pagination.getSize()));
 			paginationButtons.add(button);
+			
 		}
 		
 		if(!pagination.isLast()) {
 			
-			InlineKeyboardButton button = new InlineKeyboardButton(">>")
-					.callbackData("/feeds?page="+pagination.getNextPage().get()+"&size="+pagination.getSize());
+			InlineKeyboardButton button = new InlineKeyboardButton(">>").callbackData(getFeedsUri(pagination.getNextPage().get(), pagination.getSize()));
 			
 			paginationButtons.add(button);
 		}
@@ -78,5 +78,18 @@ public class FeedsReplyMarkupMapper {
 		paginationButtons.toArray(paginationButtonsArray);
 		
 		replyMarkup.addRow(paginationButtonsArray);
+	}
+	
+	private String getFeedUri(String feedId, String action) {
+		return UriComponentsBuilder.fromPath(PathConstants.FEED_URI)
+									.queryParam("action", action)
+									.buildAndExpand(feedId, action)
+									.toString();
+	}
+	
+	private String getFeedsUri(int page, int size) {
+		return UriComponentsBuilder.fromPath(PathConstants.FEEDS_URI)
+									.buildAndExpand(page, size)
+									.toString();
 	}
 }

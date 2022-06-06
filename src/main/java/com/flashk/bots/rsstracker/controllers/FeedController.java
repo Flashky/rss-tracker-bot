@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
 import com.flashk.bots.rsstracker.constants.MessageConstants;
+import com.flashk.bots.rsstracker.controllers.constants.PathConstants;
 import com.flashk.bots.rsstracker.controllers.mappers.FeedsReplyMarkupMapper;
 import com.flashk.bots.rsstracker.services.FeedService;
 import com.flashk.bots.rsstracker.services.LocalizedMessageService;
@@ -71,7 +72,7 @@ public class FeedController implements TelegramMvcController {
 	
 	}
 	
-    @CallbackQueryRequest(value = "/feeds?page={page}&size={size}")
+    @CallbackQueryRequest(value = PathConstants.FEEDS_URI)
     public EditMessageText listFeedsCallback(TelegramRequest request, @BotPathVariable("page") Integer page, @BotPathVariable("size") Integer size) {
     	
     	User user = request.getUser();
