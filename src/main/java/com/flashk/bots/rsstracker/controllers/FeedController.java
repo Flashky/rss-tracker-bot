@@ -67,10 +67,8 @@ public class FeedController implements TelegramMvcController {
     		
     	} else {
     		
-    		SendMessage feedsMessage = new SendMessage(chat.id(), messageService.getText(MessageConstants.RSS_FEED_LIST_TITLE, user.languageCode()))
-    									.replyMarkup(replyMarkup.get());
-  
-    		return feedsMessage;
+    		return new SendMessage(chat.id(), messageService.getText(MessageConstants.RSS_FEED_LIST_TITLE, user.languageCode()))
+    						.replyMarkup(replyMarkup.get());
     	}
 		
 	
@@ -102,12 +100,10 @@ public class FeedController implements TelegramMvcController {
     		
     	} else {
   
-    		
-    		EditMessageText feedsMessage = new EditMessageText(chat.id(),  callbackQuery.message().messageId(), 
-    															messageService.getText(MessageConstants.RSS_FEED_LIST_TITLE, user.languageCode()))
-    												.replyMarkup(replyMarkup.get());
-  
-    		return feedsMessage;
+    		return new EditMessageText(chat.id(), callbackQuery.message().messageId(), 
+    									messageService.getText(MessageConstants.RSS_FEED_LIST_TITLE, user.languageCode()))
+    				.replyMarkup(replyMarkup.get());
+ 
     	}
     	
     }
