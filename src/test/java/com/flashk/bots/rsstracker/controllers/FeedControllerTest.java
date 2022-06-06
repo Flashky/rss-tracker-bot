@@ -1,7 +1,6 @@
 package com.flashk.bots.rsstracker.controllers;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.ArgumentMatchers.any;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,8 +12,8 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.context.MessageSource;
 
+import com.flashk.bots.rsstracker.services.LocalizedMessageService;
 import com.pengrad.telegrambot.model.Chat;
 import com.pengrad.telegrambot.model.User;
 import com.pengrad.telegrambot.request.SendMessage;
@@ -32,7 +31,7 @@ class FeedControllerTest {
 	private FeedController feedController = new FeedController();
 	
 	@Mock
-	private MessageSource messageSource;
+	private LocalizedMessageService localizedMessageService;
     
 	@BeforeAll
 	static void setUpBeforeClass() throws Exception {
@@ -55,7 +54,7 @@ class FeedControllerTest {
 		Chat chat = podamFactory.manufacturePojo(Chat.class);
 		
 		// Prepare mocks
-		Mockito.when(messageSource.getMessage(any(), any(), any())).thenReturn("TEST_MESSAGE");
+		//Mockito.when(localizedMessageService.getText(any(), any())).thenReturn("TEST_MESSAGE");
 		 
 		// Execute method
 		SendMessage result = feedController.addFeed(user, chat);
