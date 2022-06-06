@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 
-import com.flashk.bots.rsstracker.constants.MessageCode;
+import com.flashk.bots.rsstracker.constants.MessageConstants;
 import com.flashk.bots.rsstracker.controllers.mappers.FeedsReplyMarkupMapper;
 import com.flashk.bots.rsstracker.services.FeedService;
 import com.flashk.bots.rsstracker.services.model.Feed;
@@ -58,10 +58,20 @@ public class FeedController implements TelegramMvcController {
 		Optional<InlineKeyboardMarkup> replyMarkup = feedsReplyMarkupMapper.map(feeds);
 		
 		if(replyMarkup.isEmpty()) {
-    		return new SendMessage(chat.id(), "You don't have any feeds.");
+			
+			String noFeedsText = messageSource.getMessage(MessageConstants.RSS_FEED_LIST_EMPTY, 
+					null, 
+					Locale.forLanguageTag(user.languageCode()));
+			
+    		return new SendMessage(chat.id(), noFeedsText);
+    		
     	} else {
-
-    		SendMessage feedsMessage = new SendMessage(chat.id(), "Your RSS feeds:")
+    		
+    		String feedListTitleText = messageSource.getMessage(MessageConstants.RSS_FEED_LIST_TITLE, 
+					null, 
+					Locale.forLanguageTag(user.languageCode()));
+    		
+    		SendMessage feedsMessage = new SendMessage(chat.id(), feedListTitleText)
     									.replyMarkup(replyMarkup.get());
   
     		return feedsMessage;
@@ -88,10 +98,20 @@ public class FeedController implements TelegramMvcController {
     	Optional<InlineKeyboardMarkup> replyMarkup = feedsReplyMarkupMapper.map(feeds);
     	
     	if(replyMarkup.isEmpty()) {
-    		return new EditMessageText(chat.id(), callbackQuery.message().messageId(), "You don't have any feeds.");
+    		
+    		String noFeedsText = messageSource.getMessage(MessageConstants.RSS_FEED_LIST_EMPTY, 
+					null, 
+					Locale.forLanguageTag(user.languageCode()));
+    		
+    		return new EditMessageText(chat.id(), callbackQuery.message().messageId(), noFeedsText);
+    		
     	} else {
     		
-    		EditMessageText feedsMessage = new EditMessageText(chat.id(),  callbackQuery.message().messageId(), "Your RSS feeds:")
+    		String feedListTitleText = messageSource.getMessage(MessageConstants.RSS_FEED_LIST_TITLE, 
+					null, 
+					Locale.forLanguageTag(user.languageCode()));
+    		
+    		EditMessageText feedsMessage = new EditMessageText(chat.id(),  callbackQuery.message().messageId(), feedListTitleText)
     				.replyMarkup(replyMarkup.get());
   
     		return feedsMessage;
@@ -105,7 +125,7 @@ public class FeedController implements TelegramMvcController {
     	
     	ForceReply forceReply = new ForceReply().inputFieldPlaceholder("https://your-rss-feed-url");
     	
-    	String addFeedText = messageSource.getMessage(MessageCode.RSS_FEED_ADD, 
+    	String addFeedText = messageSource.getMessage(MessageConstants.RSS_FEED_ADD, 
     													null, 
     													Locale.forLanguageTag(user.languageCode()));
     	
@@ -122,7 +142,7 @@ public class FeedController implements TelegramMvcController {
     		return;
     	}
     	
-		if(messageSource.getMessage(MessageCode.RSS_FEED_ADD, 
+		if(messageSource.getMessage(MessageConstants.RSS_FEED_ADD, 
 									null, 
 									Locale.forLanguageTag(request.getUser().languageCode())).equals(replyToMessage.text())) {
 			createFeed(request);
@@ -140,7 +160,7 @@ public class FeedController implements TelegramMvcController {
 											request.getChat().id(), 
 											request.getMessage().text());
 		
-		String feedCreatedMessage = messageSource.getMessage(MessageCode.RSS_FEED_ADDED, 
+		String feedCreatedMessage = messageSource.getMessage(MessageConstants.RSS_FEED_ADDED, 
 																new Object[] { feed.getTitle() }, 
 																Locale.forLanguageTag(request.getUser().languageCode()));
 	
