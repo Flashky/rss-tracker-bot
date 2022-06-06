@@ -16,7 +16,7 @@ import com.pengrad.telegrambot.model.request.InlineKeyboardButton;
 import com.pengrad.telegrambot.model.request.InlineKeyboardMarkup;
 
 @Mapper(componentModel = "spring")
-public class FeedsReplyMarkupMapper {
+public abstract class FeedsReplyMarkupMapper {
 
 	public Optional<InlineKeyboardMarkup> map(PagedResponse<Feed> feeds) {
 		
