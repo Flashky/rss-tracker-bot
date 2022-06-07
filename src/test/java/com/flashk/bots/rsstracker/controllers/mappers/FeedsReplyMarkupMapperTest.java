@@ -15,6 +15,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.flashk.bots.rsstracker.services.model.Feed;
 import com.flashk.bots.rsstracker.services.model.PagedResponse;
+import com.flashk.bots.rsstracker.services.model.Pagination;
 import com.pengrad.telegrambot.model.request.InlineKeyboardMarkup;
 
 import uk.co.jemos.podam.api.PodamFactory;
@@ -24,6 +25,10 @@ import uk.co.jemos.podam.api.PodamFactoryImpl;
 @ExtendWith(MockitoExtension.class)
 class FeedsReplyMarkupMapperTest {
 
+	private static final int TOTAL_ELEMENTS = 15;
+	private static final int SIZE = 5;
+	private static final int SECOND_PAGE = 1;
+	
 	private static PodamFactory podamFactory;
 	
 	@Spy
@@ -38,7 +43,7 @@ class FeedsReplyMarkupMapperTest {
 	static void setUpBeforeClass() throws Exception {
 		
 	    podamFactory = new PodamFactoryImpl();
-	    podamFactory.getStrategy().setDefaultNumberOfCollectionElements(2);
+	    podamFactory.getStrategy().setDefaultNumberOfCollectionElements(TOTAL_ELEMENTS);
 	    
 	}
 
@@ -51,6 +56,8 @@ class FeedsReplyMarkupMapperTest {
 
 		// Prepare POJOs
 		PagedResponse<Feed> expected = podamFactory.manufacturePojo(PagedResponse.class, Feed.class);
+		Pagination pagination = new Pagination(SECOND_PAGE, SIZE, TOTAL_ELEMENTS);
+		expected.setPagination(pagination);
 		
 		// Execute method
 		Optional<InlineKeyboardMarkup> result = feedReplyMarkupMapper.map(expected);

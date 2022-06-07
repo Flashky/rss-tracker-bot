@@ -3,6 +3,7 @@ package com.flashk.bots.rsstracker.services.model;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -78,5 +79,30 @@ class PaginationTest {
 		assertFalse(result.getNextPage().isPresent());
 		assertTrue(result.isLast());
 	}
+	
+	@Test
+	void testPaginationNegativePageThrowsException() {
+		
+		// Prepare POJOs
+		int page = -1;
+		int size = 5;
+		long totalElements = 5;
+		long totalPages = ONE_PAGE;
+		
+		// Execute method
+		assertThrows(IllegalArgumentException.class, () -> new Pagination(page, size, totalElements, totalPages));
+	}
 
+	@Test
+	void testPagination2NegativePageThrowsException() {
+		
+		// Prepare POJOs
+		int page = -1;
+		int size = 5;
+		long totalElements = 5;
+		
+		// Execute method
+		assertThrows(IllegalArgumentException.class, () -> new Pagination(page, size, totalElements));
+	}
+	
 }

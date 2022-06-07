@@ -1,7 +1,9 @@
 package com.flashk.bots.rsstracker.repositories;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 
 import java.util.ArrayList;
@@ -33,6 +35,7 @@ import uk.co.jemos.podam.api.PodamFactoryImpl;
 @ExtendWith(MockitoExtension.class)
 class SyndEntryItemRepositoryTest {
 
+	private final static String SAMPLE_FEED = "https://rss.app/feeds/tyjLcmBKeSw9wfxu.xml";
 	private final static int NO_ELEMENTS = 0;
 	private final static int FIRST_PAGE = 0;
 	private final static int SIZE = 5;
@@ -53,6 +56,35 @@ class SyndEntryItemRepositoryTest {
 	    podamFactory = new PodamFactoryImpl();
 	    podamFactory.getStrategy().setDefaultNumberOfCollectionElements(TOTAL_ELEMENTS);
 	    
+	}
+	
+	@Test
+	void testFindByFeedUrlReal() {
+
+		// Prepare POJOs
+		String feedUrl = SAMPLE_FEED;
+		Pageable pageable =  PageRequest.of(FIRST_PAGE, SIZE);
+		
+		// Execute method
+		Page<ItemEntity> result = itemRepository.findByFeedUrl(feedUrl, pageable);
+		
+		// Assertions
+		assertNotNull(result);
+		assertFalse(result.getContent().isEmpty());
+		
+	}
+	
+	
+	@Test
+	void testFindByFeedUrlRealInvalidRssFeed() {
+
+		// Prepare POJOs
+		String feedUrl = "https://google.com";
+		Pageable pageable =  PageRequest.of(FIRST_PAGE, SIZE);
+	
+		// Execute method
+		assertThrows(Exception.class, () -> itemRepository.findByFeedUrl(feedUrl, pageable));
+		
 	}
 	
 	@Test
