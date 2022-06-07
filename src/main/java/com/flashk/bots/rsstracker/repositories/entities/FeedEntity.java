@@ -1,4 +1,4 @@
-package com.flashk.bots.rsstracker.repositories.feeds.entities;
+package com.flashk.bots.rsstracker.repositories.entities;
 
 import java.util.Date;
 

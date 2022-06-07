@@ -1,4 +1,4 @@
-package com.flashk.bots.rsstracker.repositories.feeds;
+package com.flashk.bots.rsstracker.repositories;
 
 import java.io.IOException;
 import java.net.URL;
@@ -11,8 +11,8 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
-import com.flashk.bots.rsstracker.repositories.feeds.entities.ItemEntity;
-import com.flashk.bots.rsstracker.repositories.feeds.mappers.ItemEntityMapper;
+import com.flashk.bots.rsstracker.repositories.entities.ItemEntity;
+import com.flashk.bots.rsstracker.repositories.mappers.ItemEntityMapper;
 import com.flashk.bots.rsstracker.services.exceptions.InvalidRssException;
 import com.rometools.rome.feed.synd.SyndEntry;
 import com.rometools.rome.feed.synd.SyndFeed;

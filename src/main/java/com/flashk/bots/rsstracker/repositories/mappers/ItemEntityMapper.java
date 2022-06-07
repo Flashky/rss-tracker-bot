@@ -1,4 +1,4 @@
-package com.flashk.bots.rsstracker.repositories.feeds.mappers;
+package com.flashk.bots.rsstracker.repositories.mappers;
 
 import java.util.List;
 
@@ -6,7 +6,7 @@ import org.mapstruct.Mapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 
-import com.flashk.bots.rsstracker.repositories.feeds.entities.ItemEntity;
+import com.flashk.bots.rsstracker.repositories.entities.ItemEntity;
 import com.rometools.rome.feed.synd.SyndEntry;
 
 @Mapper(componentModel = "spring")

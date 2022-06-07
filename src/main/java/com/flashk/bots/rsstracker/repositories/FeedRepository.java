@@ -1,10 +1,10 @@
-package com.flashk.bots.rsstracker.repositories.feeds;
+package com.flashk.bots.rsstracker.repositories;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
-import com.flashk.bots.rsstracker.repositories.feeds.entities.FeedEntity;
+import com.flashk.bots.rsstracker.repositories.entities.FeedEntity;
 
 public interface FeedRepository extends MongoRepository<FeedEntity, String> {
 

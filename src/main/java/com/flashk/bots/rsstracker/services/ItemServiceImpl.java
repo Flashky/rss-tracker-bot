@@ -6,8 +6,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import com.flashk.bots.rsstracker.repositories.feeds.ItemRepository;
-import com.flashk.bots.rsstracker.repositories.feeds.entities.ItemEntity;
+import com.flashk.bots.rsstracker.repositories.ItemRepository;
+import com.flashk.bots.rsstracker.repositories.entities.ItemEntity;
 import com.flashk.bots.rsstracker.services.mappers.ItemMapper;
 import com.flashk.bots.rsstracker.services.model.Item;
 import com.flashk.bots.rsstracker.services.model.PagedResponse;

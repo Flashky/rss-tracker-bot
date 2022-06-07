@@ -1,9 +1,9 @@
-package com.flashk.bots.rsstracker.repositories.feeds;
+package com.flashk.bots.rsstracker.repositories;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import com.flashk.bots.rsstracker.repositories.feeds.entities.ItemEntity;
+import com.flashk.bots.rsstracker.repositories.entities.ItemEntity;
 
 public interface ItemRepository {
 

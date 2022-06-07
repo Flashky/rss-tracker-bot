@@ -11,9 +11,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import com.flashk.bots.rsstracker.repositories.feeds.FeedRepository;
-import com.flashk.bots.rsstracker.repositories.feeds.entities.FeedEntity;
-import com.flashk.bots.rsstracker.repositories.feeds.entities.TelegramEntity;
+import com.flashk.bots.rsstracker.repositories.FeedRepository;
+import com.flashk.bots.rsstracker.repositories.entities.FeedEntity;
+import com.flashk.bots.rsstracker.repositories.entities.TelegramEntity;
 import com.flashk.bots.rsstracker.services.exceptions.InvalidRssException;
 import com.flashk.bots.rsstracker.services.mappers.FeedMapper;
 import com.flashk.bots.rsstracker.services.model.Feed;
