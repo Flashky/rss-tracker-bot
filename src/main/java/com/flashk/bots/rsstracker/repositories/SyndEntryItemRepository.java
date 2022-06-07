@@ -2,17 +2,15 @@ package com.flashk.bots.rsstracker.repositories;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import com.flashk.bots.rsstracker.repositories.entities.ItemEntity;
 import com.flashk.bots.rsstracker.repositories.mappers.ItemEntityMapper;
+import com.flashk.bots.rsstracker.repositories.utils.PageBuilder;
 import com.flashk.bots.rsstracker.services.exceptions.InvalidRssException;
 import com.rometools.rome.feed.synd.SyndEntry;
 import com.rometools.rome.feed.synd.SyndFeed;
@@ -37,8 +35,10 @@ public class SyndEntryItemRepository implements ItemRepository {
 		SyndFeed feed = readRss(feedUrl);
 		
 		// Page the results
-		Page<SyndEntry> page = getPage(pageable, feed.getEntries());
-		
+		Page<SyndEntry> page = new PageBuilder<SyndEntry>(feed.getEntries())
+									.of(pageable)
+									.build();
+				
 		return itemEntityMapper.map(page);
 	}
 
@@ -47,7 +47,7 @@ public class SyndEntryItemRepository implements ItemRepository {
 	 * @param feedUrl the feed url.
 	 * @return a SyndFeed object that represents the content of the feed.
 	 */
-	private SyndFeed readRss(String feedUrl) {
+	protected SyndFeed readRss(String feedUrl) {
 		
 		try {
 			
@@ -60,24 +60,5 @@ public class SyndEntryItemRepository implements ItemRepository {
 		}
 		
 	}
-	
-	/**
-	 * Builds a page from the input pageable data and list of entries.
-	 * @param pageable the pagination information.
-	 * @param entries the list of entries.
-	 * @return a page of entries.
-	 */
-	private Page<SyndEntry> getPage(Pageable pageable, List<SyndEntry> entries) {
-		
-		long skipNumber = pageable.getPageNumber() * pageable.getPageSize();
-		List<SyndEntry> filteredEntries = entries.stream().skip(skipNumber).limit(pageable.getPageSize()).collect(Collectors.toList()); 
-		
-		return new PageImpl<>(filteredEntries, pageable, entries.size());
-	}
-	
-	
-	
-
-
 
 }
