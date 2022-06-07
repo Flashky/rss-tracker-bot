@@ -22,8 +22,8 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
-import com.flashk.bots.rsstracker.repositories.feeds.FeedRepository;
-import com.flashk.bots.rsstracker.repositories.feeds.entities.FeedEntity;
+import com.flashk.bots.rsstracker.repositories.FeedRepository;
+import com.flashk.bots.rsstracker.repositories.entities.FeedEntity;
 import com.flashk.bots.rsstracker.services.exceptions.InvalidRssException;
 import com.flashk.bots.rsstracker.services.mappers.FeedMapper;
 import com.flashk.bots.rsstracker.services.mappers.FeedMapperImpl;
