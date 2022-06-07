@@ -7,6 +7,7 @@ import static org.mockito.ArgumentMatchers.any;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -140,6 +141,51 @@ class FeedServiceImplTest {
 		
 		assertNotNull(result);
 		assertTrue(result.isEmpty());
+	}
+	
+	@Test
+	void testGetFeed() {
+	
+		// Prepare POJOs
+		String feedId = podamFactory.manufacturePojo(String.class);
+		FeedEntity feedEntity = podamFactory.manufacturePojo(FeedEntity.class);
+		feedEntity.setId(feedId);
+		Optional<FeedEntity> expected = Optional.ofNullable(feedEntity);
+		
+		// Prepare mocks
+		Mockito.doReturn(expected).when(feedRepository).findById(any());
+		
+		// Execute method
+		Optional<Feed> result = feedService.getFeed(feedId);
+		
+		// Assertions
+		Mockito.verify(feedRepository).findById(any());
+		
+		assertNotNull(result);
+		assertTrue(result.isPresent());
+		assertEquals(feedId, result.get().getId());
+		
+	}
+	
+	@Test
+	void testGetFeedNonExisting() {
+	
+		// Prepare POJOs
+		String feedId = podamFactory.manufacturePojo(String.class);
+		Optional<FeedEntity> expected = Optional.empty();
+		
+		// Prepare mocks
+		Mockito.doReturn(expected).when(feedRepository).findById(any());
+		
+		// Execute method
+		Optional<Feed> result = feedService.getFeed(feedId);
+		
+		// Assertions
+		Mockito.verify(feedRepository).findById(any());
+		
+		assertNotNull(result);
+		assertTrue(result.isEmpty());
+		
 	}
 	
 	private Page<FeedEntity> manufacturePagePojo(int page, int size) {
