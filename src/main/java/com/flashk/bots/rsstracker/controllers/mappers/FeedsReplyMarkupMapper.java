@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import com.flashk.bots.rsstracker.controllers.constants.Constants;
+import com.flashk.bots.rsstracker.controllers.constants.CommonConstants;
 import com.flashk.bots.rsstracker.services.model.Feed;
 import com.flashk.bots.rsstracker.services.model.PagedResponse;
 import com.flashk.bots.rsstracker.services.model.Pagination;
@@ -51,7 +51,7 @@ public class FeedsReplyMarkupMapper {
 		for(Feed feed : feedData) {
 			
 			InlineKeyboardButton button = new InlineKeyboardButton(feed.getTitle())
-											.callbackData(urlBuilder.getFeedItemsUri(feed.getId(), Constants.FIRST_PAGE, pageSize));
+											.callbackData(urlBuilder.getFeedItemsUri(feed.getId(), CommonConstants.FIRST_PAGE, pageSize));
 			
 			replyMarkup.addRow(button);
 			
@@ -69,7 +69,7 @@ public class FeedsReplyMarkupMapper {
 		
 		if(!pagination.isFirst()) {
 			
-			InlineKeyboardButton button = new InlineKeyboardButton(Constants.PREVIOUS_PAGE)
+			InlineKeyboardButton button = new InlineKeyboardButton(CommonConstants.PREVIOUS_PAGE)
 					.callbackData(urlBuilder.getFeedsUri(pagination.getPreviousPage().get(), pagination.getSize()));
 			
 			paginationButtons.add(button);
@@ -78,7 +78,7 @@ public class FeedsReplyMarkupMapper {
 		
 		if(!pagination.isLast()) {
 			
-			InlineKeyboardButton button = new InlineKeyboardButton(Constants.NEXT_PAGE)
+			InlineKeyboardButton button = new InlineKeyboardButton(CommonConstants.NEXT_PAGE)
 					.callbackData(urlBuilder.getFeedsUri(pagination.getNextPage().get(), pagination.getSize()));		
 			
 			paginationButtons.add(button);

@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
-import com.flashk.bots.rsstracker.controllers.constants.Constants;
+import com.flashk.bots.rsstracker.controllers.constants.CommonConstants;
 import com.flashk.bots.rsstracker.repositories.utils.PageBuilder;
 import com.flashk.bots.rsstracker.services.model.Feed;
 import com.flashk.bots.rsstracker.services.model.Item;
@@ -64,7 +64,7 @@ public class ItemsReplyMarkupMapper {
 		
 		if(items.hasPrevious()) {
 			
-			InlineKeyboardButton button = new InlineKeyboardButton(Constants.PREVIOUS_PAGE)
+			InlineKeyboardButton button = new InlineKeyboardButton(CommonConstants.PREVIOUS_PAGE)
 					.callbackData(urlBuilder.getFeedItemsUri(feed.getId(), items.previousPageable().getPageNumber(), items.getSize()));
 			
 			paginationButtons.add(button);
@@ -72,14 +72,14 @@ public class ItemsReplyMarkupMapper {
 		}
 		
 		InlineKeyboardButton backButton = new InlineKeyboardButton("Back to RSS list")
-				.callbackData(urlBuilder.getFeedsUri(Constants.FIRST_PAGE, pageSize));
+				.callbackData(urlBuilder.getFeedsUri(CommonConstants.FIRST_PAGE, pageSize));
 		
 		paginationButtons.add(backButton);
 		
 		
 		if(items.hasNext()) {
 			
-			InlineKeyboardButton button = new InlineKeyboardButton(Constants.NEXT_PAGE)
+			InlineKeyboardButton button = new InlineKeyboardButton(CommonConstants.NEXT_PAGE)
 					.callbackData(urlBuilder.getFeedItemsUri(feed.getId(), items.nextPageable().getPageNumber(), items.getSize()));		
 			
 			paginationButtons.add(button);

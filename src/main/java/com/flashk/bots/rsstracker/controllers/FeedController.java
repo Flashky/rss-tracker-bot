@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
 import com.flashk.bots.rsstracker.constants.MessageConstants;
-import com.flashk.bots.rsstracker.controllers.constants.Constants;
+import com.flashk.bots.rsstracker.controllers.constants.CommonConstants;
 import com.flashk.bots.rsstracker.controllers.constants.PathConstants;
 import com.flashk.bots.rsstracker.controllers.mappers.FeedsReplyMarkupMapper;
 import com.flashk.bots.rsstracker.controllers.mappers.ItemsReplyMarkupMapper;
@@ -60,7 +60,7 @@ public class FeedController implements TelegramMvcController {
 	public SendMessage listFeeds(User user, Chat chat) {
 		
 		// Obtain feeds
-		PagedResponse<Feed> feeds = feedService.listFeeds(user.id(), Constants.FIRST_PAGE, pageSize);
+		PagedResponse<Feed> feeds = feedService.listFeeds(user.id(), CommonConstants.FIRST_PAGE, pageSize);
 		
 		// Prepare response
 		Optional<InlineKeyboardMarkup> replyMarkup = feedsReplyMarkupMapper.map(feeds);
