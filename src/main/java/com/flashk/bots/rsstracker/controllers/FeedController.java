@@ -187,7 +187,7 @@ public class FeedController implements TelegramMvcController {
     	
     	SendMessage response = new SendMessage(request.getChat().id(), messageService.getText(MessageConstants.RSS_FEED_ADDED, request.getUser().languageCode(), feed.getTitle()))
     				.replyMarkup(replyMarkup)
-    				.parseMode(ParseMode.Markdown);
+    				.parseMode(ParseMode.MarkdownV2);
 		
 		request.getTelegramBot().execute(response);
 	}
