@@ -1,6 +1,5 @@
 package com.flashk.bots.rsstracker.services.mappers;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.mapstruct.Mapper;
@@ -11,10 +10,18 @@ import org.springframework.data.domain.PageImpl;
 import com.flashk.bots.rsstracker.repositories.entities.FeedEntity;
 import com.flashk.bots.rsstracker.services.model.Feed;
 import com.rometools.rome.feed.synd.SyndEntry;
+import com.rometools.rome.feed.synd.SyndFeed;
 
 @Mapper(componentModel = "spring")
 public abstract class FeedMapper {	
 	
+	@Mapping(source = "userId", target = "telegram.userId")
+	@Mapping(source = "chatId", target = "telegram.chatId")
+	@Mapping(target = "id", ignore = true)
+	@Mapping(target = "isEnabled", ignore = true)
+	@Mapping(target = "createdDate", ignore = true)
+	@Mapping(target = "lastModifiedDate", ignore = true)
+	public abstract FeedEntity map(Long userId, Long chatId, String sourceLink, SyndFeed syndFeed);
 	public abstract Feed map(FeedEntity feedEntity, List<SyndEntry> items);
 	
 	@Mapping(target = "items", ignore = true)
@@ -37,7 +44,6 @@ public abstract class FeedMapper {
 												feedEntitiesPage.getPageable(), 
 												feedEntitiesPage.getTotalElements());
 		
-				
 		return feedPage;
 	}
 

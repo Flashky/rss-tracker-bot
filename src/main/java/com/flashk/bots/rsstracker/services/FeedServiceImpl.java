@@ -35,25 +35,12 @@ public class FeedServiceImpl implements FeedService {
 	@Override
 	public Feed createFeed(Long userId, Long chatId, String feedUrl) {
 		
-		
 		// Obtain feed data
 		SyndFeed feed = feedReader.read(feedUrl);
 		
 		// Prepare the entity to save
-		TelegramEntity telegramEntity = TelegramEntity.builder()
-				.userId(userId)
-				.chatId(chatId)
-				.build();
+		FeedEntity feedEntity = feedMapper.map(userId, chatId, feedUrl, feed);
 		
-		FeedEntity feedEntity = FeedEntity.builder()
-				.title(feed.getTitle())
-				.description(feed.getDescription())
-				.link(feed.getLink())
-				.telegram(telegramEntity)
-				.sourceLink(feedUrl)
-				.isEnabled(true)
-				.build();
-
 		// Save entity and return it
 		FeedEntity savedFeedEntity = feedRepository.save(feedEntity);
 		

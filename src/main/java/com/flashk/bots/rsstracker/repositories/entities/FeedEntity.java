@@ -9,13 +9,11 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
-import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-@Builder
 @Document(collection = "rssFeeds", collation = "{ 'locale' :  'es' }")
 public class FeedEntity {
 
@@ -54,7 +52,7 @@ public class FeedEntity {
 	/**
 	 * Defines if the RSS feed has Telegram notifications enabled.
 	 */
-	private Boolean isEnabled;
+	private Boolean isEnabled = true;
 	
 	// Auditing fields
 	
@@ -65,7 +63,6 @@ public class FeedEntity {
 	@LastModifiedDate
 	@JsonFormat(timezone = "GMT+02:00")
 	private Date lastModifiedDate;
-	
 
 	
 }
