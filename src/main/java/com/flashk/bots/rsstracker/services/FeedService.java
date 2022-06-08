@@ -2,8 +2,9 @@ package com.flashk.bots.rsstracker.services;
 
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+
 import com.flashk.bots.rsstracker.services.model.Feed;
-import com.flashk.bots.rsstracker.services.model.PagedResponse;
 
 public interface FeedService {
 
@@ -23,7 +24,7 @@ public interface FeedService {
 	 * @param size the size of the page to be returned, must be greater than 0.
 	 * @return a page of feeds.
 	 */
-	PagedResponse<Feed> listFeeds(Long userId, int page, int size);
+	Page<Feed> listFeeds(Long userId, int page, int size);
 	
 	/**
 	 * Retrieve a single feed.

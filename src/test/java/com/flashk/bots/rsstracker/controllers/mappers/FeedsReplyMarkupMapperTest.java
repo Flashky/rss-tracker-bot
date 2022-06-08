@@ -3,6 +3,7 @@ package com.flashk.bots.rsstracker.controllers.mappers;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -12,10 +13,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 
 import com.flashk.bots.rsstracker.services.model.Feed;
-import com.flashk.bots.rsstracker.services.model.PagedResponse;
-import com.flashk.bots.rsstracker.services.model.Pagination;
 import com.pengrad.telegrambot.model.request.InlineKeyboardMarkup;
 
 import uk.co.jemos.podam.api.PodamFactory;
@@ -25,8 +27,10 @@ import uk.co.jemos.podam.api.PodamFactoryImpl;
 @ExtendWith(MockitoExtension.class)
 class FeedsReplyMarkupMapperTest {
 
+	private static final int NO_ELEMENTS = 0;
 	private static final int TOTAL_ELEMENTS = 15;
 	private static final int SIZE = 5;
+	private static final int FIRST_PAGE = 0;
 	private static final int SECOND_PAGE = 1;
 	
 	private static PodamFactory podamFactory;
@@ -55,9 +59,8 @@ class FeedsReplyMarkupMapperTest {
 	void testMap() {
 
 		// Prepare POJOs
-		PagedResponse<Feed> expected = podamFactory.manufacturePojo(PagedResponse.class, Feed.class);
-		Pagination pagination = new Pagination(SECOND_PAGE, SIZE, TOTAL_ELEMENTS);
-		expected.setPagination(pagination);
+		List<Feed> feeds = podamFactory.manufacturePojo(ArrayList.class, Feed.class);
+		Page<Feed> expected = new PageImpl<Feed>(feeds, PageRequest.of(SECOND_PAGE, SIZE), TOTAL_ELEMENTS);
 		
 		// Execute method
 		Optional<InlineKeyboardMarkup> result = feedReplyMarkupMapper.map(expected);
@@ -71,8 +74,8 @@ class FeedsReplyMarkupMapperTest {
 	void testMapEmptyFeedsIsMappedToEmptyReplyMarkup() {
 
 		// Prepare POJOs
-		PagedResponse<Feed> expected = podamFactory.manufacturePojo(PagedResponse.class, Feed.class);
-		expected.setData(new ArrayList<>());
+		List<Feed> feeds = new ArrayList<>();
+		Page<Feed> expected = new PageImpl<Feed>(feeds, PageRequest.of(FIRST_PAGE, SIZE), NO_ELEMENTS);
 		
 		// Execute method
 		Optional<InlineKeyboardMarkup> result = feedReplyMarkupMapper.map(expected);

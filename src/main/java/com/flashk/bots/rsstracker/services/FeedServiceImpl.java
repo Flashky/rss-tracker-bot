@@ -15,7 +15,6 @@ import com.flashk.bots.rsstracker.repositories.entities.FeedEntity;
 import com.flashk.bots.rsstracker.repositories.entities.TelegramEntity;
 import com.flashk.bots.rsstracker.services.mappers.FeedMapper;
 import com.flashk.bots.rsstracker.services.model.Feed;
-import com.flashk.bots.rsstracker.services.model.PagedResponse;
 import com.flashk.bots.rsstracker.services.util.FeedReader;
 import com.rometools.rome.feed.synd.SyndEntry;
 import com.rometools.rome.feed.synd.SyndFeed;
@@ -62,7 +61,7 @@ public class FeedServiceImpl implements FeedService {
 	}
 	
 	@Override
-	public PagedResponse<Feed> listFeeds(Long userId, int page, int size) {
+	public Page<Feed> listFeeds(Long userId, int page, int size) {
 		
 		Pageable pageable = PageRequest.of(page, size);
 		

@@ -6,11 +6,10 @@ import java.util.List;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 
 import com.flashk.bots.rsstracker.repositories.entities.FeedEntity;
 import com.flashk.bots.rsstracker.services.model.Feed;
-import com.flashk.bots.rsstracker.services.model.PagedResponse;
-import com.flashk.bots.rsstracker.services.model.Pagination;
 import com.rometools.rome.feed.synd.SyndEntry;
 
 @Mapper(componentModel = "spring")
@@ -26,28 +25,20 @@ public abstract class FeedMapper {
 	 * @param feedEntitiesPage the feed entities page to map.
 	 * @return a paged response feed.
 	 */
-	public PagedResponse<Feed> map(Page<FeedEntity> feedEntitiesPage) {
-		
-		PagedResponse<Feed> pagedResponse = new PagedResponse<>();
+	public Page<Feed> map(Page<FeedEntity> feedEntitiesPage) {
 		
 		// No data
 		if(feedEntitiesPage == null || feedEntitiesPage.isEmpty()) {
-			pagedResponse.setData(new ArrayList<>());
-			return pagedResponse;
+			return Page.empty(feedEntitiesPage.getPageable());
 		}
 		
 		// Map the data
-		pagedResponse.setData(map(feedEntitiesPage.getContent()));
+		Page<Feed> feedPage = new PageImpl<>(map(feedEntitiesPage.getContent()), 
+												feedEntitiesPage.getPageable(), 
+												feedEntitiesPage.getTotalElements());
 		
-		// Map the pagination
-		Pagination pagination = new Pagination(feedEntitiesPage.getNumber(), 
-												feedEntitiesPage.getSize(), 
-												feedEntitiesPage.getTotalElements(), 
-												feedEntitiesPage.getTotalPages());
-		
-		pagedResponse.setPagination(pagination);
-		
-		return pagedResponse;
+				
+		return feedPage;
 	}
 
 	

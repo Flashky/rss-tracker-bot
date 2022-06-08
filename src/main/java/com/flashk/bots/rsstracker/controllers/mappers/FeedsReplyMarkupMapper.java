@@ -6,12 +6,11 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
 import com.flashk.bots.rsstracker.controllers.constants.CommonConstants;
 import com.flashk.bots.rsstracker.services.model.Feed;
-import com.flashk.bots.rsstracker.services.model.PagedResponse;
-import com.flashk.bots.rsstracker.services.model.Pagination;
 import com.pengrad.telegrambot.model.request.InlineKeyboardButton;
 import com.pengrad.telegrambot.model.request.InlineKeyboardMarkup;
 
@@ -24,19 +23,19 @@ public class FeedsReplyMarkupMapper {
 	@Autowired
 	private UrlBuilder urlBuilder;
 	
-	public Optional<InlineKeyboardMarkup> map(PagedResponse<Feed> feeds) {
+	public Optional<InlineKeyboardMarkup> map(Page<Feed> feeds) {
 		
-		if(feeds.getData().isEmpty()) {
+		if(feeds.isEmpty()) {
 			return Optional.empty();
 		}
 
 		InlineKeyboardMarkup replyMarkup = new InlineKeyboardMarkup();
 		
 		// Feeds
-		map(replyMarkup, feeds.getData());
+		map(replyMarkup, feeds.getContent());
 		
 		// Buttons
-		map(replyMarkup, feeds.getPagination());
+		map(replyMarkup, feeds);
 		
 		return Optional.of(replyMarkup);
 	}
@@ -63,23 +62,23 @@ public class FeedsReplyMarkupMapper {
 	 * @param replyMarkup an InlineKeyboardMarkup to add pagination data.
 	 * @param pagination the pagination to add.
 	 */
-	private void map(InlineKeyboardMarkup replyMarkup, Pagination pagination) {
+	private void map(InlineKeyboardMarkup replyMarkup, Page<Feed> feedPage) {
 		
 		List<InlineKeyboardButton> paginationButtons = new ArrayList<>();
 		
-		if(!pagination.isFirst()) {
+		if(feedPage.hasPrevious()) {
 			
 			InlineKeyboardButton button = new InlineKeyboardButton(CommonConstants.PREVIOUS_PAGE)
-					.callbackData(urlBuilder.getFeedsUri(pagination.getPreviousPage().get(), pagination.getSize()));
+					.callbackData(urlBuilder.getFeedsUri(feedPage.previousPageable().getPageNumber(), feedPage.getSize()));
 			
 			paginationButtons.add(button);
 			
 		}
 		
-		if(!pagination.isLast()) {
+		if(feedPage.hasNext()) {
 			
 			InlineKeyboardButton button = new InlineKeyboardButton(CommonConstants.NEXT_PAGE)
-					.callbackData(urlBuilder.getFeedsUri(pagination.getNextPage().get(), pagination.getSize()));		
+					.callbackData(urlBuilder.getFeedsUri(feedPage.nextPageable().getPageNumber(), feedPage.getSize()));		
 			
 			paginationButtons.add(button);
 			

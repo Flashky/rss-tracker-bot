@@ -30,7 +30,6 @@ import com.flashk.bots.rsstracker.services.exceptions.InvalidRssException;
 import com.flashk.bots.rsstracker.services.mappers.FeedMapper;
 import com.flashk.bots.rsstracker.services.mappers.FeedMapperImpl;
 import com.flashk.bots.rsstracker.services.model.Feed;
-import com.flashk.bots.rsstracker.services.model.PagedResponse;
 import com.flashk.bots.rsstracker.services.util.FeedReader;
 
 import uk.co.jemos.podam.api.PodamFactory;
@@ -119,13 +118,13 @@ class FeedServiceImplTest {
 		Mockito.doReturn(feedEntitiesPage).when(feedRepository).findByTelegramUserId(any(), any());
 		
 		// Execute method
-		PagedResponse<Feed> result = feedService.listFeeds(userId, page, size);
+		Page<Feed> result = feedService.listFeeds(userId, page, size);
 		
 		// Assertions
 		Mockito.verify(feedRepository).findByTelegramUserId(any(), any()); // Feeds have been searched
 		
 		assertNotNull(result);
-		assertEquals(feedEntitiesPage.getContent().size(), result.getData().size());
+		assertEquals(feedEntitiesPage.getContent().size(), result.getContent().size());
 	}
 
 	@Test
@@ -141,7 +140,7 @@ class FeedServiceImplTest {
 		Mockito.doReturn(feedEntitiesPage).when(feedRepository).findByTelegramUserId(any(), any());
 		
 		// Execute method
-		PagedResponse<Feed> result = feedService.listFeeds(userId, page, size);
+		Page<Feed> result = feedService.listFeeds(userId, page, size);
 		
 		// Assertions
 		Mockito.verify(feedRepository).findByTelegramUserId(any(), any()); // Feeds have been searched

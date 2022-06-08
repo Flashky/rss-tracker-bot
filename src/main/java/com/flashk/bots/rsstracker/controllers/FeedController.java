@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
 
 import com.flashk.bots.rsstracker.constants.MessageConstants;
 import com.flashk.bots.rsstracker.controllers.constants.CommonConstants;
@@ -13,7 +14,6 @@ import com.flashk.bots.rsstracker.controllers.mappers.ItemsReplyMarkupMapper;
 import com.flashk.bots.rsstracker.services.FeedService;
 import com.flashk.bots.rsstracker.services.LocalizedMessageService;
 import com.flashk.bots.rsstracker.services.model.Feed;
-import com.flashk.bots.rsstracker.services.model.PagedResponse;
 import com.github.kshashov.telegram.api.TelegramMvcController;
 import com.github.kshashov.telegram.api.TelegramRequest;
 import com.github.kshashov.telegram.api.bind.annotation.BotController;
@@ -60,7 +60,7 @@ public class FeedController implements TelegramMvcController {
 	public SendMessage listFeeds(User user, Chat chat) {
 		
 		// Obtain feeds
-		PagedResponse<Feed> feeds = feedService.listFeeds(user.id(), CommonConstants.FIRST_PAGE, pageSize);
+		Page<Feed> feeds = feedService.listFeeds(user.id(), CommonConstants.FIRST_PAGE, pageSize);
 		
 		// Prepare response
 		Optional<InlineKeyboardMarkup> replyMarkup = feedsReplyMarkupMapper.map(feeds);
@@ -92,7 +92,7 @@ public class FeedController implements TelegramMvcController {
 
     	
     	// Obtain feeds
-    	PagedResponse<Feed> feeds = feedService.listFeeds(user.id(), page, size);
+    	Page<Feed> feeds = feedService.listFeeds(user.id(), page, size);
     	
     	// Prepare response
     	Optional<InlineKeyboardMarkup> replyMarkup = feedsReplyMarkupMapper.map(feeds);
