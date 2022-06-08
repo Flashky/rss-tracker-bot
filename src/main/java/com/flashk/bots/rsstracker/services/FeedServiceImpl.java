@@ -12,7 +12,6 @@ import org.springframework.validation.annotation.Validated;
 
 import com.flashk.bots.rsstracker.repositories.FeedRepository;
 import com.flashk.bots.rsstracker.repositories.entities.FeedEntity;
-import com.flashk.bots.rsstracker.repositories.entities.TelegramEntity;
 import com.flashk.bots.rsstracker.services.mappers.FeedMapper;
 import com.flashk.bots.rsstracker.services.model.Feed;
 import com.flashk.bots.rsstracker.services.util.FeedReader;
