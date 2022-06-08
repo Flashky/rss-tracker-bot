@@ -11,10 +11,8 @@ import com.flashk.bots.rsstracker.controllers.constants.PathConstants;
 import com.flashk.bots.rsstracker.controllers.mappers.FeedsReplyMarkupMapper;
 import com.flashk.bots.rsstracker.controllers.mappers.ItemsReplyMarkupMapper;
 import com.flashk.bots.rsstracker.services.FeedService;
-import com.flashk.bots.rsstracker.services.ItemService;
 import com.flashk.bots.rsstracker.services.LocalizedMessageService;
 import com.flashk.bots.rsstracker.services.model.Feed;
-import com.flashk.bots.rsstracker.services.model.Item;
 import com.flashk.bots.rsstracker.services.model.PagedResponse;
 import com.github.kshashov.telegram.api.TelegramMvcController;
 import com.github.kshashov.telegram.api.TelegramRequest;
@@ -43,9 +41,6 @@ public class FeedController implements TelegramMvcController {
     
     @Autowired
     private FeedService feedService;
-    
-    @Autowired
-    private ItemService itemService;
     
     @Autowired
     private LocalizedMessageService messageService;
@@ -132,15 +127,12 @@ public class FeedController implements TelegramMvcController {
     	if(feed.isEmpty()) {
     		return new EditMessageText(chat.id(), callbackQuery.message().messageId(), "Sorry, I couldn't find that feed.");
     	}
-    	
-    	
-    	PagedResponse<Item> items = itemService.listItems(feed.get().getSourceLink(), page, size);
 
     	// Answer callback query
     	request.getTelegramBot().execute(new AnswerCallbackQuery(callbackQuery.id()));
     	
     	// Prepare response
-    	Optional<InlineKeyboardMarkup> replyMarkup = itemsReplyMarkupMapper.map(feed.get(), items);
+    	Optional<InlineKeyboardMarkup> replyMarkup = itemsReplyMarkupMapper.map(feed.get(), page, size);
     	
     	if(replyMarkup.isEmpty()) {
     		return new EditMessageText(chat.id(), callbackQuery.message().messageId(), "There are no items on this feed yet");

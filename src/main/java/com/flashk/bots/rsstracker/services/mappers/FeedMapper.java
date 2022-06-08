@@ -4,17 +4,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.springframework.data.domain.Page;
 
 import com.flashk.bots.rsstracker.repositories.entities.FeedEntity;
 import com.flashk.bots.rsstracker.services.model.Feed;
 import com.flashk.bots.rsstracker.services.model.PagedResponse;
 import com.flashk.bots.rsstracker.services.model.Pagination;
+import com.rometools.rome.feed.synd.SyndEntry;
 
 @Mapper(componentModel = "spring")
 public abstract class FeedMapper {	
 	
-	public abstract Feed map(FeedEntity feedEntity);
+	public abstract Feed map(FeedEntity feedEntity, List<SyndEntry> items);
+	
+	@Mapping(target = "items", ignore = true)
 	public abstract List<Feed> map(List<FeedEntity> feedEntities);
 	
 	/**

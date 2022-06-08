@@ -2,6 +2,7 @@ package com.flashk.bots.rsstracker.services;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 
@@ -14,6 +15,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -29,6 +31,7 @@ import com.flashk.bots.rsstracker.services.mappers.FeedMapper;
 import com.flashk.bots.rsstracker.services.mappers.FeedMapperImpl;
 import com.flashk.bots.rsstracker.services.model.Feed;
 import com.flashk.bots.rsstracker.services.model.PagedResponse;
+import com.flashk.bots.rsstracker.services.util.FeedReader;
 
 import uk.co.jemos.podam.api.PodamFactory;
 import uk.co.jemos.podam.api.PodamFactoryImpl;
@@ -41,15 +44,19 @@ class FeedServiceImplTest {
 	
 	// RSS feed "integration test" generated via https://rss.app
 	private static final String FEED_URL = "https://rss.app/feeds/tyjLcmBKeSw9wfxu.xml";
+	private static final String INVALID_FEED_URL = "https://google.com";
 	
 	@InjectMocks
 	@Spy
 	private FeedServiceImpl feedService = new FeedServiceImpl();
 
 	@Spy
-	private FeedMapper feedMapper = new FeedMapperImpl();
+	private FeedReader feedReader;
 	
 	@Spy
+	private FeedMapper feedMapper = new FeedMapperImpl();
+	
+	@Mock
 	private FeedRepository feedRepository;
 	
 	@BeforeAll
@@ -150,6 +157,7 @@ class FeedServiceImplTest {
 		String feedId = podamFactory.manufacturePojo(String.class);
 		FeedEntity feedEntity = podamFactory.manufacturePojo(FeedEntity.class);
 		feedEntity.setId(feedId);
+		feedEntity.setSourceLink(FEED_URL);
 		Optional<FeedEntity> expected = Optional.ofNullable(feedEntity);
 		
 		// Prepare mocks
@@ -187,6 +195,26 @@ class FeedServiceImplTest {
 		assertTrue(result.isEmpty());
 		
 	}
+	
+	@Test
+	void testGetFeedInvalidUrl() {
+	
+		// Prepare POJOs
+		String feedId = podamFactory.manufacturePojo(String.class);
+		
+		FeedEntity feedEntity = podamFactory.manufacturePojo(FeedEntity.class);
+		feedEntity.setId(feedId);
+		feedEntity.setSourceLink(INVALID_FEED_URL);
+		Optional<FeedEntity> expected = Optional.ofNullable(feedEntity);
+		
+		// Prepare mocks
+		Mockito.doReturn(expected).when(feedRepository).findById(any());
+		
+		// Execute method
+		assertThrows(InvalidRssException.class, () -> feedService.getFeed(any()));
+		
+	}
+	
 	
 	private Page<FeedEntity> manufacturePagePojo(int page, int size) {
 		

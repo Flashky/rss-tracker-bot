@@ -1,5 +1,7 @@
 package com.flashk.bots.rsstracker.services.model;
 
+import java.util.List;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,4 +13,5 @@ public class Feed {
 	private String title;
 	private String description;
 	private String link;
+	private List<Item> items;
 }
