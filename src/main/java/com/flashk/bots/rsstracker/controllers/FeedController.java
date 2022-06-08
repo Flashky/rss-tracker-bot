@@ -26,6 +26,7 @@ import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.User;
 import com.pengrad.telegrambot.model.request.ForceReply;
 import com.pengrad.telegrambot.model.request.InlineKeyboardMarkup;
+import com.pengrad.telegrambot.model.request.ParseMode;
 import com.pengrad.telegrambot.request.AnswerCallbackQuery;
 import com.pengrad.telegrambot.request.EditMessageText;
 import com.pengrad.telegrambot.request.SendMessage;
@@ -72,7 +73,8 @@ public class FeedController implements TelegramMvcController {
     	} else {
     		
     		return new SendMessage(chat.id(), messageService.getText(MessageConstants.RSS_FEED_LIST_TITLE, user.languageCode()))
-    						.replyMarkup(replyMarkup.get());
+    						.replyMarkup(replyMarkup.get())
+    						.parseMode(ParseMode.Markdown);
     	}
 		
 	
@@ -106,7 +108,8 @@ public class FeedController implements TelegramMvcController {
   
     		return new EditMessageText(chat.id(), callbackQuery.message().messageId(), 
     									messageService.getText(MessageConstants.RSS_FEED_LIST_TITLE, user.languageCode()))
-    				.replyMarkup(replyMarkup.get());
+    				.replyMarkup(replyMarkup.get())
+    				.parseMode(ParseMode.Markdown);
  
     	}
     	
@@ -119,6 +122,7 @@ public class FeedController implements TelegramMvcController {
 											@BotPathVariable(PathConstants.QUERY_SIZE) Integer size) {
     	
     	Chat chat = request.getChat();
+    	User user = request.getUser();
     	CallbackQuery callbackQuery = request.getUpdate().callbackQuery();
     	
     	// Obtain feed
@@ -134,8 +138,10 @@ public class FeedController implements TelegramMvcController {
     	// Prepare response
     	InlineKeyboardMarkup replyMarkup = itemsReplyMarkupMapper.map(request.getUser(), feed.get(), page, size);
     	
-    	return new EditMessageText(chat.id(), callbackQuery.message().messageId(), feed.get().getTitle())
-    				.replyMarkup(replyMarkup);
+    	String text = messageService.getText(MessageConstants.RSS_FEED_ITEM_LIST_TITLE, user.languageCode(), feed.get().getTitle());
+    	return new EditMessageText(chat.id(), callbackQuery.message().messageId(), text)
+    				.replyMarkup(replyMarkup)
+    				.parseMode(ParseMode.Markdown);
     	
     }
 	
