@@ -1,8 +1,7 @@
-package com.flashk.bots.rsstracker.controllers.mappers;
+package 	com.flashk.bots.rsstracker.controllers.mappers;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,34 +30,25 @@ public class ItemsReplyMarkupMapper {
 	@Autowired
 	private UrlBuilder urlBuilder;
 	
-	public Optional<InlineKeyboardMarkup> map(User user, Feed feed, int itemPage, int size) {
+	public InlineKeyboardMarkup map(User user, Feed feed, int itemPage, int size) {
 		
-	
-		if(feed.getItems().isEmpty()) {
-			return Optional.empty();
-		}
-		
-		// Paginate result
-		Page<Item> itemsPage = new PageBuilder<>(feed.getItems()).of(itemPage, size).build();
-
 		InlineKeyboardMarkup replyMarkup = new InlineKeyboardMarkup();
 		
-		// Items
-		map(replyMarkup, itemsPage);
+		// Add items and pagination
+		if(!feed.getItems().isEmpty()) {
+			Page<Item> itemsPage = new PageBuilder<>(feed.getItems()).of(itemPage, size).build();
 		
-		// Pagination buttons
-		map(replyMarkup, user, feed, itemsPage);
+			addItems(replyMarkup, itemsPage);
+			addPaginationButtons(replyMarkup, user, feed, itemsPage);
+		}
 		
-		// Return to feed list
-		InlineKeyboardButton backButton = new InlineKeyboardButton(messageService.getText(MessageConstants.LABEL_BACK_FEED_LIST, user.languageCode()))
-				.callbackData(urlBuilder.getFeedsUri(CommonConstants.FIRST_PAGE, pageSize));
+		// Add back button
+		addBackButton(replyMarkup, user);
 		
-		replyMarkup.addRow(backButton);
-		
-		return Optional.of(replyMarkup);
+		return replyMarkup;
 	}
 
-	private void map(InlineKeyboardMarkup replyMarkup, Page<Item> itemData) {
+	private void addItems(InlineKeyboardMarkup replyMarkup, Page<Item> itemData) {
 		
 		for(Item item : itemData.getContent()) {
 			
@@ -70,7 +60,7 @@ public class ItemsReplyMarkupMapper {
 		}
 	}
 	
-	private void map(InlineKeyboardMarkup replyMarkup, User user, Feed feed, Page<Item> items) {
+	private void addPaginationButtons(InlineKeyboardMarkup replyMarkup, User user, Feed feed, Page<Item> items) {
 		
 		List<InlineKeyboardButton> paginationButtons = new ArrayList<>();
 		
@@ -101,5 +91,13 @@ public class ItemsReplyMarkupMapper {
 			replyMarkup.addRow(paginationButtonsArray);
 		}
 		
+	}
+	
+	private void addBackButton(InlineKeyboardMarkup replyMarkup, User user) {
+		
+		InlineKeyboardButton backButton = new InlineKeyboardButton(messageService.getText(MessageConstants.LABEL_BACK_FEED_LIST, user.languageCode()))
+				.callbackData(urlBuilder.getFeedsUri(CommonConstants.FIRST_PAGE, pageSize));
+		
+		replyMarkup.addRow(backButton);
 	}
 }

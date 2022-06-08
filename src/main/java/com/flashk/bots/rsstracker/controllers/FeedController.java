@@ -25,6 +25,7 @@ import com.pengrad.telegrambot.model.Chat;
 import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.User;
 import com.pengrad.telegrambot.model.request.ForceReply;
+import com.pengrad.telegrambot.model.request.InlineKeyboardButton;
 import com.pengrad.telegrambot.model.request.InlineKeyboardMarkup;
 import com.pengrad.telegrambot.request.AnswerCallbackQuery;
 import com.pengrad.telegrambot.request.EditMessageText;
@@ -132,15 +133,10 @@ public class FeedController implements TelegramMvcController {
     	request.getTelegramBot().execute(new AnswerCallbackQuery(callbackQuery.id()));
     	
     	// Prepare response
-    	Optional<InlineKeyboardMarkup> replyMarkup = itemsReplyMarkupMapper.map(request.getUser(), feed.get(), page, size);
+    	InlineKeyboardMarkup replyMarkup = itemsReplyMarkupMapper.map(request.getUser(), feed.get(), page, size);
     	
-    	if(replyMarkup.isEmpty()) {
-    		return new EditMessageText(chat.id(), callbackQuery.message().messageId(), "There are no items on this feed yet");
-    				//.replyMarkup(replyMarkup.get());
-    	} else {
-    		return new EditMessageText(chat.id(), callbackQuery.message().messageId(), feed.get().getTitle())
-    				.replyMarkup(replyMarkup.get());
-    	}
+    	return new EditMessageText(chat.id(), callbackQuery.message().messageId(), feed.get().getTitle())
+    				.replyMarkup(replyMarkup);
     	
     }
 	
@@ -176,18 +172,17 @@ public class FeedController implements TelegramMvcController {
      */
 	private void createFeed(TelegramRequest request) {
 		
+		// Create feed
 		Feed feed = feedService.createFeed(request.getUser().id(), 
 											request.getChat().id(), 
 											request.getMessage().text());
 
-    	// Prepare response
-    	Optional<InlineKeyboardMarkup> replyMarkup = itemsReplyMarkupMapper.map(request.getUser(), feed, CommonConstants.FIRST_PAGE, pageSize);
+		// Bot response
+    	InlineKeyboardMarkup replyMarkup = itemsReplyMarkupMapper.map(request.getUser(), feed, CommonConstants.FIRST_PAGE, pageSize);
     	
-		SendMessage feedCreatedMessage = new SendMessage(request.getChat().id(), 
-															messageService.getText(MessageConstants.RSS_FEED_ADDED, request.getUser().languageCode(), feed.getTitle()))
-				.replyMarkup(replyMarkup.get());
-
+    	SendMessage response = new SendMessage(request.getChat().id(), messageService.getText(MessageConstants.RSS_FEED_ADDED, request.getUser().languageCode(), feed.getTitle()))
+    				.replyMarkup(replyMarkup);
 		
-		request.getTelegramBot().execute(feedCreatedMessage);
+		request.getTelegramBot().execute(response);
 	}
 }
