@@ -1,5 +1,6 @@
 package com.flashk.bots.rsstracker.controllers.mappers;
 
+import static org.assertj.core.api.Assertions.useRepresentation;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
@@ -11,13 +12,16 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 
+import com.flashk.bots.rsstracker.services.LocalizedMessageService;
 import com.flashk.bots.rsstracker.services.model.Feed;
+import com.pengrad.telegrambot.model.User;
 import com.pengrad.telegrambot.model.request.InlineKeyboardMarkup;
 
 import uk.co.jemos.podam.api.PodamFactory;
@@ -38,6 +42,9 @@ class FeedsReplyMarkupMapperTest {
 	@Spy
 	@InjectMocks
 	private FeedsReplyMarkupMapper feedReplyMarkupMapper = new FeedsReplyMarkupMapper();
+	
+	@Mock
+	private LocalizedMessageService messageService;
 	
 	@Spy
 	private UrlBuilder urlBuilder;
@@ -61,9 +68,10 @@ class FeedsReplyMarkupMapperTest {
 		// Prepare POJOs
 		List<Feed> feeds = podamFactory.manufacturePojo(ArrayList.class, Feed.class);
 		Page<Feed> expected = new PageImpl<Feed>(feeds, PageRequest.of(SECOND_PAGE, SIZE), TOTAL_ELEMENTS);
+		User user = new User(23L);
 		
 		// Execute method
-		Optional<InlineKeyboardMarkup> result = feedReplyMarkupMapper.map(expected);
+		Optional<InlineKeyboardMarkup> result = feedReplyMarkupMapper.map(user, expected);
 		
 		// Assertions
 		assertTrue(result.isPresent());
@@ -76,9 +84,10 @@ class FeedsReplyMarkupMapperTest {
 		// Prepare POJOs
 		List<Feed> feeds = new ArrayList<>();
 		Page<Feed> expected = new PageImpl<Feed>(feeds, PageRequest.of(FIRST_PAGE, SIZE), NO_ELEMENTS);
+		User user = new User(23L);
 		
 		// Execute method
-		Optional<InlineKeyboardMarkup> result = feedReplyMarkupMapper.map(expected);
+		Optional<InlineKeyboardMarkup> result = feedReplyMarkupMapper.map(user, expected);
 		
 		// Assertions
 		assertTrue(result.isEmpty());

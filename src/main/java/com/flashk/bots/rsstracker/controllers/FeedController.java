@@ -63,7 +63,7 @@ public class FeedController implements TelegramMvcController {
 		Page<Feed> feeds = feedService.listFeeds(user.id(), CommonConstants.FIRST_PAGE, pageSize);
 		
 		// Prepare response
-		Optional<InlineKeyboardMarkup> replyMarkup = feedsReplyMarkupMapper.map(feeds);
+		Optional<InlineKeyboardMarkup> replyMarkup = feedsReplyMarkupMapper.map(user, feeds);
 		
 		if(replyMarkup.isEmpty()) {
 		
@@ -95,7 +95,7 @@ public class FeedController implements TelegramMvcController {
     	Page<Feed> feeds = feedService.listFeeds(user.id(), page, size);
     	
     	// Prepare response
-    	Optional<InlineKeyboardMarkup> replyMarkup = feedsReplyMarkupMapper.map(feeds);
+    	Optional<InlineKeyboardMarkup> replyMarkup = feedsReplyMarkupMapper.map(user, feeds);
     	
     	if(replyMarkup.isEmpty()) {
     		
@@ -132,10 +132,11 @@ public class FeedController implements TelegramMvcController {
     	request.getTelegramBot().execute(new AnswerCallbackQuery(callbackQuery.id()));
     	
     	// Prepare response
-    	Optional<InlineKeyboardMarkup> replyMarkup = itemsReplyMarkupMapper.map(feed.get(), page, size);
+    	Optional<InlineKeyboardMarkup> replyMarkup = itemsReplyMarkupMapper.map(request.getUser(), feed.get(), page, size);
     	
     	if(replyMarkup.isEmpty()) {
     		return new EditMessageText(chat.id(), callbackQuery.message().messageId(), "There are no items on this feed yet");
+    				//.replyMarkup(replyMarkup.get());
     	} else {
     		return new EditMessageText(chat.id(), callbackQuery.message().messageId(), feed.get().getTitle())
     				.replyMarkup(replyMarkup.get());
@@ -180,7 +181,7 @@ public class FeedController implements TelegramMvcController {
 											request.getMessage().text());
 
     	// Prepare response
-    	Optional<InlineKeyboardMarkup> replyMarkup = itemsReplyMarkupMapper.map(feed, CommonConstants.FIRST_PAGE, pageSize);
+    	Optional<InlineKeyboardMarkup> replyMarkup = itemsReplyMarkupMapper.map(request.getUser(), feed, CommonConstants.FIRST_PAGE, pageSize);
     	
 		SendMessage feedCreatedMessage = new SendMessage(request.getChat().id(), 
 															messageService.getText(MessageConstants.RSS_FEED_ADDED, request.getUser().languageCode(), feed.getTitle()))

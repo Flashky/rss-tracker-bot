@@ -9,10 +9,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
+import com.flashk.bots.rsstracker.constants.MessageConstants;
 import com.flashk.bots.rsstracker.controllers.constants.CommonConstants;
 import com.flashk.bots.rsstracker.repositories.utils.PageBuilder;
+import com.flashk.bots.rsstracker.services.LocalizedMessageServiceImpl;
 import com.flashk.bots.rsstracker.services.model.Feed;
 import com.flashk.bots.rsstracker.services.model.Item;
+import com.pengrad.telegrambot.model.User;
 import com.pengrad.telegrambot.model.request.InlineKeyboardButton;
 import com.pengrad.telegrambot.model.request.InlineKeyboardMarkup;
 
@@ -22,10 +25,13 @@ public class ItemsReplyMarkupMapper {
     @Value("${bot.feeds.page-size}")
     private int pageSize;
     
+    @Autowired
+    private LocalizedMessageServiceImpl messageService;
+    
 	@Autowired
 	private UrlBuilder urlBuilder;
 	
-	public Optional<InlineKeyboardMarkup> map(Feed feed, int itemPage, int size) {
+	public Optional<InlineKeyboardMarkup> map(User user, Feed feed, int itemPage, int size) {
 		
 	
 		if(feed.getItems().isEmpty()) {
@@ -41,10 +47,10 @@ public class ItemsReplyMarkupMapper {
 		map(replyMarkup, itemsPage);
 		
 		// Pagination buttons
-		map(replyMarkup, feed, itemsPage);
+		map(replyMarkup, user, feed, itemsPage);
 		
 		// Return to feed list
-		InlineKeyboardButton backButton = new InlineKeyboardButton("Back to RSS list")
+		InlineKeyboardButton backButton = new InlineKeyboardButton(messageService.getText(MessageConstants.LABEL_BACK_FEED_LIST, user.languageCode()))
 				.callbackData(urlBuilder.getFeedsUri(CommonConstants.FIRST_PAGE, pageSize));
 		
 		replyMarkup.addRow(backButton);
@@ -64,13 +70,13 @@ public class ItemsReplyMarkupMapper {
 		}
 	}
 	
-	private void map(InlineKeyboardMarkup replyMarkup, Feed feed, Page<Item> items) {
+	private void map(InlineKeyboardMarkup replyMarkup, User user, Feed feed, Page<Item> items) {
 		
 		List<InlineKeyboardButton> paginationButtons = new ArrayList<>();
 		
 		if(items.hasPrevious()) {
 			
-			InlineKeyboardButton button = new InlineKeyboardButton(CommonConstants.PREVIOUS_PAGE)
+			InlineKeyboardButton button = new InlineKeyboardButton(messageService.getText(MessageConstants.LABEL_PREVIOUS_PAGE, user.languageCode()))
 					.callbackData(urlBuilder.getFeedItemsUri(feed.getId(), items.previousPageable().getPageNumber(), items.getSize()));
 			
 			paginationButtons.add(button);
@@ -80,7 +86,7 @@ public class ItemsReplyMarkupMapper {
 		
 		if(items.hasNext()) {
 			
-			InlineKeyboardButton button = new InlineKeyboardButton(CommonConstants.NEXT_PAGE)
+			InlineKeyboardButton button = new InlineKeyboardButton(messageService.getText(MessageConstants.LABEL_NEXT_PAGE, user.languageCode()))
 					.callbackData(urlBuilder.getFeedItemsUri(feed.getId(), items.nextPageable().getPageNumber(), items.getSize()));		
 			
 			paginationButtons.add(button);

@@ -9,8 +9,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
+import com.flashk.bots.rsstracker.constants.MessageConstants;
 import com.flashk.bots.rsstracker.controllers.constants.CommonConstants;
+import com.flashk.bots.rsstracker.services.LocalizedMessageService;
 import com.flashk.bots.rsstracker.services.model.Feed;
+import com.pengrad.telegrambot.model.User;
 import com.pengrad.telegrambot.model.request.InlineKeyboardButton;
 import com.pengrad.telegrambot.model.request.InlineKeyboardMarkup;
 
@@ -20,10 +23,13 @@ public class FeedsReplyMarkupMapper {
     @Value("${bot.feeds.page-size}")
     private int pageSize;
     
+    @Autowired
+    private LocalizedMessageService messageService;
+    
 	@Autowired
 	private UrlBuilder urlBuilder;
 	
-	public Optional<InlineKeyboardMarkup> map(Page<Feed> feeds) {
+	public Optional<InlineKeyboardMarkup> map(User user, Page<Feed> feeds) {
 		
 		if(feeds.isEmpty()) {
 			return Optional.empty();
@@ -35,7 +41,7 @@ public class FeedsReplyMarkupMapper {
 		map(replyMarkup, feeds.getContent());
 		
 		// Buttons
-		map(replyMarkup, feeds);
+		map(replyMarkup, user, feeds);
 		
 		return Optional.of(replyMarkup);
 	}
@@ -62,13 +68,13 @@ public class FeedsReplyMarkupMapper {
 	 * @param replyMarkup an InlineKeyboardMarkup to add pagination data.
 	 * @param pagination the pagination to add.
 	 */
-	private void map(InlineKeyboardMarkup replyMarkup, Page<Feed> feedPage) {
+	private void map(InlineKeyboardMarkup replyMarkup, User user, Page<Feed> feedPage) {
 		
 		List<InlineKeyboardButton> paginationButtons = new ArrayList<>();
 		
 		if(feedPage.hasPrevious()) {
 			
-			InlineKeyboardButton button = new InlineKeyboardButton(CommonConstants.PREVIOUS_PAGE)
+			InlineKeyboardButton button = new InlineKeyboardButton(messageService.getText(MessageConstants.LABEL_PREVIOUS_PAGE, user.languageCode()))
 					.callbackData(urlBuilder.getFeedsUri(feedPage.previousPageable().getPageNumber(), feedPage.getSize()));
 			
 			paginationButtons.add(button);
@@ -77,7 +83,7 @@ public class FeedsReplyMarkupMapper {
 		
 		if(feedPage.hasNext()) {
 			
-			InlineKeyboardButton button = new InlineKeyboardButton(CommonConstants.NEXT_PAGE)
+			InlineKeyboardButton button = new InlineKeyboardButton(messageService.getText(MessageConstants.LABEL_NEXT_PAGE, user.languageCode()))
 					.callbackData(urlBuilder.getFeedsUri(feedPage.nextPageable().getPageNumber(), feedPage.getSize()));		
 			
 			paginationButtons.add(button);
