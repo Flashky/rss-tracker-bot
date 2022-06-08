@@ -40,8 +40,14 @@ public class ItemsReplyMarkupMapper {
 		// Items
 		map(replyMarkup, itemsPage);
 		
-		// Buttons
+		// Pagination buttons
 		map(replyMarkup, feed, itemsPage);
+		
+		// Return to feed list
+		InlineKeyboardButton backButton = new InlineKeyboardButton("Back to RSS list")
+				.callbackData(urlBuilder.getFeedsUri(CommonConstants.FIRST_PAGE, pageSize));
+		
+		replyMarkup.addRow(backButton);
 		
 		return Optional.of(replyMarkup);
 	}
@@ -71,11 +77,6 @@ public class ItemsReplyMarkupMapper {
 			
 		}
 		
-		InlineKeyboardButton backButton = new InlineKeyboardButton("Back to RSS list")
-				.callbackData(urlBuilder.getFeedsUri(CommonConstants.FIRST_PAGE, pageSize));
-		
-		paginationButtons.add(backButton);
-		
 		
 		if(items.hasNext()) {
 			
@@ -85,6 +86,7 @@ public class ItemsReplyMarkupMapper {
 			paginationButtons.add(button);
 			
 		}
+		
 		
 		if(!paginationButtons.isEmpty()) {
 			InlineKeyboardButton[] paginationButtonsArray = new InlineKeyboardButton[paginationButtons.size()];
