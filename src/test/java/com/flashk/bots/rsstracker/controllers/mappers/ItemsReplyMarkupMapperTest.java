@@ -13,6 +13,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.flashk.bots.rsstracker.services.LocalizedMessageService;
 import com.flashk.bots.rsstracker.services.model.Feed;
+import com.flashk.bots.rsstracker.test.utils.Util;
 import com.pengrad.telegrambot.model.User;
 import com.pengrad.telegrambot.model.request.InlineKeyboardMarkup;
 
@@ -44,6 +45,8 @@ class ItemsReplyMarkupMapperTest {
 	@BeforeAll
 	static void setUpBeforeClass() throws Exception {
 		
+       Util.disablePodamLogs();
+        
 	    podamFactory = new PodamFactoryImpl();
 	    
 	}

@@ -14,6 +14,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
+import com.flashk.bots.rsstracker.test.utils.Util;
+
 import uk.co.jemos.podam.api.PodamFactory;
 import uk.co.jemos.podam.api.PodamFactoryImpl;
 
@@ -36,6 +38,8 @@ class PageBuilderTest {
 	
 	@BeforeAll
 	static void setUpBeforeClass() throws Exception {
+		
+		Util.disablePodamLogs();
 		
 	    podamFactory = new PodamFactoryImpl();
 	}

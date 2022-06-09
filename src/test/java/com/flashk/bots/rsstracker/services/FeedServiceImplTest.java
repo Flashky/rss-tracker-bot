@@ -31,6 +31,7 @@ import com.flashk.bots.rsstracker.services.mappers.FeedMapper;
 import com.flashk.bots.rsstracker.services.mappers.FeedMapperImpl;
 import com.flashk.bots.rsstracker.services.model.Feed;
 import com.flashk.bots.rsstracker.services.util.FeedReader;
+import com.flashk.bots.rsstracker.test.utils.Util;
 
 import uk.co.jemos.podam.api.PodamFactory;
 import uk.co.jemos.podam.api.PodamFactoryImpl;
@@ -60,6 +61,8 @@ class FeedServiceImplTest {
 	
 	@BeforeAll
 	static void setUpBeforeClass() throws Exception {
+		
+		Util.disablePodamLogs();
 		
 	    podamFactory = new PodamFactoryImpl();
 	    podamFactory.getStrategy().setDefaultNumberOfCollectionElements(2);

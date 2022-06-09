@@ -13,6 +13,7 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.flashk.bots.rsstracker.services.LocalizedMessageService;
+import com.flashk.bots.rsstracker.test.utils.Util;
 import com.pengrad.telegrambot.model.Chat;
 import com.pengrad.telegrambot.model.User;
 import com.pengrad.telegrambot.request.SendMessage;
@@ -34,6 +35,8 @@ class FeedControllerTest {
     
 	@BeforeAll
 	static void setUpBeforeClass() throws Exception {
+		
+		Util.disablePodamLogs();
 		
 	    podamFactory = new PodamFactoryImpl();
 	    podamFactory.getStrategy().setDefaultNumberOfCollectionElements(2);
