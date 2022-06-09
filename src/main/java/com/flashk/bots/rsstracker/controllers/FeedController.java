@@ -119,7 +119,7 @@ public class FeedController implements TelegramMvcController {
     }
     
     @CallbackQueryRequest(PathConstants.URI_FEED_ITEMS)
-    public EditMessageText listFeedItems(TelegramRequest request, 
+    public void listFeedItems(TelegramRequest request, 
     										@BotPathVariable(PathConstants.FEED_ID) String feedId, 
 											@BotPathVariable(PathConstants.QUERY_PAGE) Integer page, 
 											@BotPathVariable(PathConstants.QUERY_SIZE) Integer size) {
@@ -131,20 +131,27 @@ public class FeedController implements TelegramMvcController {
     	// Obtain feed
     	Optional<Feed> feed = feedService.getFeed(feedId);
     	
+      	// Prepare response
+    	EditMessageText message;
     	if(feed.isEmpty()) {
-    		return new EditMessageText(chat.id(), callbackQuery.message().messageId(), "Sorry, I couldn't find that feed.");
+    		message = new EditMessageText(chat.id(), callbackQuery.message().messageId(), "Sorry, I couldn't find that feed.");
+    	} else {
+    		
+    		InlineKeyboardMarkup replyMarkup = itemsReplyMarkupMapper.map(request.getUser(), feed.get(), page, size);
+        	
+        	String text = messageService.getText(MessageConstants.RSS_FEED_ITEM_LIST_TITLE, user.languageCode(), feed.get().getTitle());
+        	message = new EditMessageText(chat.id(), callbackQuery.message().messageId(), text)
+        				.replyMarkup(replyMarkup)
+        				.parseMode(ParseMode.Markdown);
     	}
 
+    	// Reply with message
+    	request.getTelegramBot().execute(message);
+    	
     	// Answer callback query
     	request.getTelegramBot().execute(new AnswerCallbackQuery(callbackQuery.id()));
     	
-    	// Prepare response
-    	InlineKeyboardMarkup replyMarkup = itemsReplyMarkupMapper.map(request.getUser(), feed.get(), page, size);
-    	
-    	String text = messageService.getText(MessageConstants.RSS_FEED_ITEM_LIST_TITLE, user.languageCode(), feed.get().getTitle());
-    	return new EditMessageText(chat.id(), callbackQuery.message().messageId(), text)
-    				.replyMarkup(replyMarkup)
-    				.parseMode(ParseMode.Markdown);
+  
     	
     }
 	

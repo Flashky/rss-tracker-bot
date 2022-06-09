@@ -47,6 +47,7 @@ class FeedControllerTest {
 	private final static int FIRST_PAGE = 0;
 	private final static int SIZE = 5;
 	private final static int TOTAL_ELEMENTS = 15;
+	private final static String REPLY_TEXT = "reply-text";
 	
 	private static PodamFactory podamFactory;
 	
@@ -90,8 +91,8 @@ class FeedControllerTest {
 		Optional<InlineKeyboardMarkup> replyMarkup = Optional.of(new InlineKeyboardMarkup());
 		
 		// Mocks
-		Mockito.doReturn(replyMarkup).when(feedsReplyMarkupMapper).map(any(), any());
 		Mockito.doReturn(feedsPage).when(feedService).listFeeds(any(), anyInt(), anyInt());
+		Mockito.doReturn(replyMarkup).when(feedsReplyMarkupMapper).map(any(), any());
 		
 		// Execute method
 		SendMessage result = feedController.listFeeds(user, chat);
@@ -133,10 +134,10 @@ class FeedControllerTest {
 		Optional<InlineKeyboardMarkup> replyMarkup = Optional.of(new InlineKeyboardMarkup());
 		
 		// Prepare mocks 
-		TelegramRequest request = mockTelegramRequest();
+		TelegramRequest request = mockTelegramRequestCallbackQuery();
 		
-		Mockito.doReturn(replyMarkup).when(feedsReplyMarkupMapper).map(any(), any());
 		Mockito.doReturn(feedsPage).when(feedService).listFeeds(any(), anyInt(), anyInt());
+		Mockito.doReturn(replyMarkup).when(feedsReplyMarkupMapper).map(any(), any());
 		
 		// Execute method
 		feedController.listFeedsCallback(request, FIRST_PAGE, SIZE);
@@ -151,7 +152,7 @@ class FeedControllerTest {
 	void testListFeedsCallbackNoFeeds() {
 		
 		// Prepare mocks 
-		TelegramRequest request = mockTelegramRequest();
+		TelegramRequest request = mockTelegramRequestCallbackQuery();
 	
 		// Execute method
 		feedController.listFeedsCallback(request, FIRST_PAGE, SIZE);
@@ -161,7 +162,91 @@ class FeedControllerTest {
 		
 	}
 	
-	private TelegramRequest mockTelegramRequest() {
+	@Test
+	void testListFeedItems() {
+		
+		// Prepare POJOs
+		String feedId = podamFactory.manufacturePojo(String.class);
+		Optional<Feed> feed = Optional.of(podamFactory.manufacturePojo(Feed.class));
+		InlineKeyboardMarkup replyMarkup = new InlineKeyboardMarkup();
+		
+		// Prepare mocks
+		TelegramRequest request = mockTelegramRequestCallbackQuery();
+		
+		Mockito.doReturn(feed).when(feedService).getFeed(any());
+		Mockito.doReturn(replyMarkup).when(itemsReplyMarkupMapper).map(any(), any(), anyInt(), anyInt());
+		
+		
+		// Execute method
+		feedController.listFeedItems(request, feedId, FIRST_PAGE, SIZE);
+		
+		
+		// Assertions
+		Mockito.verify(feedService).getFeed(any()); // feed is obtained
+		
+	}
+	
+	@Test
+	void testListFeedItemsNoItems() {
+		
+		// Prepare POJOs
+		String feedId = podamFactory.manufacturePojo(String.class);
+		
+		// Prepare mocks
+		TelegramRequest request = mockTelegramRequestCallbackQuery();
+		
+		// Execute method
+		feedController.listFeedItems(request, feedId, FIRST_PAGE, SIZE);
+		
+		
+		// Assertions
+		Mockito.verify(feedService).getFeed(any()); // feed is obtained
+		
+	}
+	
+	@Test
+	void testAddFeed() {
+		
+		// Execute method
+		SendMessage result = feedController.addFeed(new User(23L), new Chat());
+		
+		// Assertions
+		assertNotNull(result);
+		
+	}
+	
+	@Test
+	void testReplyNoReplyMessage() {
+		
+		// Mocks
+		TelegramRequest request = Mockito.mock(TelegramRequest.class);
+		Mockito.doReturn(new Message()).when(request).getMessage();
+
+		// Execute method
+		feedController.reply(request);
+		
+	}
+	
+	@Test
+	void testReplyCreateFeed() {
+		
+		// Prepare POJOs
+		Feed feed = podamFactory.manufacturePojo(Feed.class);
+		
+		// Mocks
+		TelegramRequest request = mockTelegramRequestReplyToMessage();
+		
+		Mockito.doReturn(REPLY_TEXT).when(messageService).getText(any(), any());
+		Mockito.doReturn(feed).when(feedService).createFeed(any(), any(), any());
+		
+		// Execute method
+		feedController.reply(request);
+		
+		// Assertions
+		Mockito.verify(feedService).createFeed(any(), any(), any());
+	}
+	
+	private TelegramRequest mockTelegramRequestCallbackQuery() {
 		
 		// Mocks
 		TelegramRequest request = Mockito.mock(TelegramRequest.class);
@@ -170,19 +255,48 @@ class FeedControllerTest {
 		CallbackQuery callbackQuery = Mockito.mock(CallbackQuery.class);
 		Message message = Mockito.mock(Message.class);
 		
-		
 		// Prepare mocks
 		Mockito.doReturn(bot).when(request).getTelegramBot();
 		Mockito.doReturn(new User(23L)).when(request).getUser();
 		Mockito.doReturn(new Chat()).when(request).getChat();
 		Mockito.doReturn(update).when(request).getUpdate();
+		
+		// CallbackQuery related mocks
 		Mockito.doReturn(callbackQuery).when(update).callbackQuery();
 		Mockito.doReturn(message).when(callbackQuery).message();
 		Mockito.doReturn(0).when(message).messageId();
+		
+		// Bot execution
 		Mockito.doReturn(null).when(bot).execute(any());
 		
 		return request;
 	}
+	
+	private TelegramRequest mockTelegramRequestReplyToMessage() {
+		
+		// Mocks
+		TelegramRequest request = Mockito.mock(TelegramRequest.class);
+		TelegramBot bot = Mockito.mock(TelegramBot.class);
+		Message message = Mockito.mock(Message.class);
+		Message replyToMessage = Mockito.mock(Message.class);
+		
+		// Prepare mocks
+		Mockito.doReturn(bot).when(request).getTelegramBot();
+		Mockito.doReturn(new User(23L)).when(request).getUser();
+		Mockito.doReturn(new Chat()).when(request).getChat();
+		Mockito.doReturn(message).when(request).getMessage();
+		
+		// Message replyToMessage() related mocks
+		Mockito.doReturn(replyToMessage).when(message).replyToMessage();
+		Mockito.doReturn(REPLY_TEXT).when(replyToMessage).text();
+		
+		// Bot execution
+		Mockito.doReturn(null).when(bot).execute(any());
+		
+		return request;
+	}
+	
+
 	
 	
 }
