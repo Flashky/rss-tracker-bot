@@ -1,6 +1,5 @@
 package com.flashk.bots.rsstracker.controllers.mappers;
 
-import static org.assertj.core.api.Assertions.useRepresentation;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
@@ -36,6 +35,7 @@ class FeedsReplyMarkupMapperTest {
 	private static final int SIZE = 5;
 	private static final int FIRST_PAGE = 0;
 	private static final int SECOND_PAGE = 1;
+	private static final int LAST_PAGE = 2;
 	
 	private static PodamFactory podamFactory;
 	
@@ -78,6 +78,39 @@ class FeedsReplyMarkupMapperTest {
 		
 	}
 
+	@Test
+	void testMapFirstPage() {
+
+		// Prepare POJOs
+		List<Feed> feeds = podamFactory.manufacturePojo(ArrayList.class, Feed.class);
+		Page<Feed> expected = new PageImpl<Feed>(feeds, PageRequest.of(FIRST_PAGE, SIZE), TOTAL_ELEMENTS);
+		User user = new User(23L);
+		
+		// Execute method
+		Optional<InlineKeyboardMarkup> result = feedReplyMarkupMapper.map(user, expected);
+		
+		// Assertions
+		assertTrue(result.isPresent());
+		
+	}
+	
+	@Test
+	void testMapLastPage() {
+
+		// Prepare POJOs
+		List<Feed> feeds = podamFactory.manufacturePojo(ArrayList.class, Feed.class);
+		Page<Feed> expected = new PageImpl<Feed>(feeds, PageRequest.of(LAST_PAGE, SIZE), TOTAL_ELEMENTS);
+		User user = new User(23L);
+		
+		// Execute method
+		Optional<InlineKeyboardMarkup> result = feedReplyMarkupMapper.map(user, expected);
+		
+		// Assertions
+		assertTrue(result.isPresent());
+		
+	}
+	
+	
 	@Test
 	void testMapEmptyFeedsIsMappedToEmptyReplyMarkup() {
 
