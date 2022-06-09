@@ -1,3 +1,4 @@
 # rss-tracker-bot
 [![Build & Report](https://github.com/Flashky/rss-tracker-bot/actions/workflows/build-report.yml/badge.svg)](https://github.com/Flashky/rss-tracker-bot/actions/workflows/build-report.yml)
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/764da114801347c2a2de95c572ec108a)](https://www.codacy.com/gh/Flashky/rss-tracker-bot/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Flashky/rss-tracker-bot&amp;utm_campaign=Badge_Grade)
+[![Codacy Badge](https://app.codacy.com/project/badge/Coverage/764da114801347c2a2de95c572ec108a)](https://www.codacy.com/gh/Flashky/rss-tracker-bot/dashboard?utm_source=github.com&utm_medium=referral&utm_content=Flashky/rss-tracker-bot&utm_campaign=Badge_Coverage)
