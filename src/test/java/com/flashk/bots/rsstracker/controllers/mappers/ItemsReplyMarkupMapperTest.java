@@ -27,7 +27,7 @@ class ItemsReplyMarkupMapperTest {
 	private static final int SIZE = 5;
 	private static final int FIRST_PAGE = 0;
 	private static final int SECOND_PAGE = 1;
-	private static final int LAST_PAGE = 3;
+	private static final int LAST_PAGE = 2;
 	
 	private static PodamFactory podamFactory;
 	
