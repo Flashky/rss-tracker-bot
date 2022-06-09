@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 import com.flashk.bots.rsstracker.constants.MessageConstants;
 import com.flashk.bots.rsstracker.controllers.constants.CommonConstants;
 import com.flashk.bots.rsstracker.repositories.utils.PageBuilder;
-import com.flashk.bots.rsstracker.services.LocalizedMessageServiceImpl;
+import com.flashk.bots.rsstracker.services.LocalizedMessageService;
 import com.flashk.bots.rsstracker.services.model.Feed;
 import com.flashk.bots.rsstracker.services.model.Item;
 import com.pengrad.telegrambot.model.User;
@@ -25,7 +25,7 @@ public class ItemsReplyMarkupMapper {
     private int pageSize;
     
     @Autowired
-    private LocalizedMessageServiceImpl messageService;
+    private LocalizedMessageService messageService;
     
 	@Autowired
 	private UrlBuilder urlBuilder;
