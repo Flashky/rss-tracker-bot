@@ -81,37 +81,40 @@ public class FeedController implements TelegramMvcController {
 	}
 	
     @CallbackQueryRequest(PathConstants.URI_FEEDS)
-    public EditMessageText listFeedsCallback(TelegramRequest request, 
+    public void listFeedsCallback(TelegramRequest request, 
     											@BotPathVariable(PathConstants.QUERY_PAGE) Integer page, 
     											@BotPathVariable(PathConstants.QUERY_SIZE) Integer size) {
     	
     	User user = request.getUser();
     	Chat chat = request.getChat();
-    	
-    	// Answer callback query
     	CallbackQuery callbackQuery = request.getUpdate().callbackQuery();
-    	request.getTelegramBot().execute(new AnswerCallbackQuery(callbackQuery.id()));
 
-    	
     	// Obtain feeds
     	Page<Feed> feeds = feedService.listFeeds(user.id(), page, size);
     	
     	// Prepare response
     	Optional<InlineKeyboardMarkup> replyMarkup = feedsReplyMarkupMapper.map(user, feeds);
     	
+    	EditMessageText message;
     	if(replyMarkup.isEmpty()) {
     		
-    		return new EditMessageText(chat.id(), callbackQuery.message().messageId(), 
+    		message = new EditMessageText(chat.id(), callbackQuery.message().messageId(), 
     									messageService.getText(MessageConstants.RSS_FEED_LIST_EMPTY, user.languageCode()));
     		
     	} else {
-  
-    		return new EditMessageText(chat.id(), callbackQuery.message().messageId(), 
+    		
+    		message = new EditMessageText(chat.id(), callbackQuery.message().messageId(), 
     									messageService.getText(MessageConstants.RSS_FEED_LIST_TITLE, user.languageCode(), feeds.getTotalElements()))
     				.replyMarkup(replyMarkup.get())
     				.parseMode(ParseMode.Markdown);
  
     	}
+    	
+    	// Reply with message
+    	request.getTelegramBot().execute(message);
+    	
+    	// Answer callback query
+    	request.getTelegramBot().execute(new AnswerCallbackQuery(callbackQuery.id()));
     	
     }
     
