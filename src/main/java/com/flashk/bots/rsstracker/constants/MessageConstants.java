@@ -2,6 +2,9 @@ package com.flashk.bots.rsstracker.constants;
 
 public final class MessageConstants {
 	
+	// Help and start messages
+	public static final String HELP_MESSAGE = "help.msg";
+	
 	// Feeds
 	public static final String RSS_FEED_ADD = "rss.feed.add";
 	public static final String RSS_FEED_ADD_SUCCESS = "rss.feed.add.success";
