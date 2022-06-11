@@ -34,3 +34,7 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# Environment files
+.env.*
+run_standalone_dev.sh
