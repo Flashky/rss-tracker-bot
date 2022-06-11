@@ -18,7 +18,10 @@ Property | Description | Default value
 
 ***:** *It is highly recommended to change both default username and password.*
 
-For [Docker](#docker-standalone) and [Docker Compose](#docker-compose) running modes, you might want to use a ``.env`` file to configure the previous properties.
+Please note:
+- For [Docker](#docker-standalone) and [Docker Compose](#docker-compose) running modes, you might want to use a ``.env`` file to configure the previous properties.
+- The property ``MONGODB_HOST`` value is ignored when using [Docker Compose](#docker-compose) running mode. It will use a default hostname ``mongodb`` specified by the ``docker-compose.yml`` file. 
+
 
 ## Running the service
 
@@ -110,3 +113,4 @@ Example with a ``.env.dev`` file:
 
 ```shell
 docker compose --env-file .env.dev up 
+```
