@@ -86,7 +86,7 @@ jobs:
     - name: Docker build & publish
       uses: elgohr/Publish-Docker-Github-Action@master
       with:
-        name: flashk/rss-tracker_v0_feeds
+        name: flashk/rss-tracker-bot
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
         tags: "latest,${{ env.RELEASE_VERSION }}"
