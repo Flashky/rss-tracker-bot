@@ -9,7 +9,7 @@ Before running the service, you will need to customize several properties or env
 
 Property | Description | Default value
 --|--|--
-``TELEGRAM_BOT_TOKEN | The Telegram Bot token provided by [@BotFather](https://t.me/botfather) | 
+``TELEGRAM_BOT_TOKEN`` | The Telegram Bot token provided by [@BotFather](https://t.me/botfather) | None
 ``MONGODB_HOST`` | The MongoDB instance hostname or ip | ``localhost``
 ``MONGODB_PORT`` | The MongoDB port | ``27017``
 ``MONGODB_USERNAME`` | The MongoDB username | ``admin`` **(*)**
@@ -51,15 +51,10 @@ Edit ``run_standalone.sh`` to modify the [configuration properties](#configurati
 
 #### Run
 
-Give execution permissions to the following script:
+Give permissions and execute:
 
 ```ssh
 chmod +x run_standalone.sh
-```
-
-Run:
-
-```ssh
 ./run_standalone.sh
 ```
 
@@ -89,7 +84,7 @@ docker run --name rss-tracker-bot -dp 8080:8080 flashk/rss-tracker-bot:latest
 In case of using a ``.env`` file to configure the properties, you can run the container using the ``--env-file`` flag:
 
 ```shell
-docker run --name rss-tracker-bot --env-file .env -dp 8080:8080 flashk/rss-tracker_v0_feeds:latest
+docker run --name rss-tracker-bot --env-file .env -dp 8080:8080 flashk/rss-tracker-bot:latest
 ```
 
 ### Docker Compose
@@ -109,7 +104,9 @@ docker compose up
 The previous command will setup a Docker container with MongoDB and another Docker container with the service. 
 It will use ``.env`` file by default for getting the [configuration properties](#configuration-properties).
 
-If you want to use multiple environments you can duplicate ``.env``, customize its values, and finally run ``docker compose`` specifying ```--env-file`` flag  to select which configuration to use:
+If you want to use multiple environments you can duplicate ``.env``, customize its values, and finally run ``docker compose`` specifying ``--env-file`` flag  to select which configuration to use.
+
+Example with a ``.env.dev`` file:
 
 ```shell
 docker compose --env-file .env.dev up 
