@@ -9,7 +9,6 @@ on:
   release:
     types: [published]
 
-
 jobs:
   
   # Obtains version from tag and verifies it is valid.
@@ -81,12 +80,11 @@ jobs:
         path: target
     - name: Get release version
       run: echo "RELEASE_VERSION=$(echo ${GITHUB_REF##*/v})" >> $GITHUB_ENV
-    
     # Builds a docker image and pushes it to DockerHub.
     - name: Docker build & publish
       uses: elgohr/Publish-Docker-Github-Action@master
       with:
-        name: flashk/rss-tracker-bot
+        name: flashk/${{ github.event.repository.name }}
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
         tags: "latest,${{ env.RELEASE_VERSION }}"
