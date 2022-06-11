@@ -7,7 +7,7 @@ name: Release version
 
 on:
   release:
-    types: [created]
+    types: [published]
 
 
 jobs:
