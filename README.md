@@ -18,7 +18,7 @@ Property | Description | Default value
 
 ***:** *It is highly recommended to change both default username and password.*
 
-For Docker run, you might want to use a ``.env`` file. 
+For [Docker](#docker-standalone) and [Docker Compose](#docker-compose) running modes, you might want to use a ``.env`` file to configure the previous properties.
 
 ## Running the service
 
