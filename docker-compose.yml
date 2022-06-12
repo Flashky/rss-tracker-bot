@@ -18,7 +18,7 @@ services:
       
   mongodb:
     image: mongo:latest
-    container_name: "mongodb"
+    container_name: rss-tracker-mongodb
     hostname: mongodb
     restart: always
     environment:
