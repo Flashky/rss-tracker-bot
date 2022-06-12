@@ -20,7 +20,10 @@ Property | Description | Default value
 
 Please note:
 - For [Docker](#docker-standalone) and [Docker Compose](#docker-compose) running modes, you might want to use a ``.env`` file to configure the previous properties.
-- The property ``MONGODB_HOST`` value is ignored when using [Docker Compose](#docker-compose) running mode. It will use a default hostname ``mongodb`` specified by the ``docker-compose.yml`` file. 
+
+Only on [Docker Compose](#docker-compose) running mode:
+- ``MONGODB_HOST`` value is ignored when using. It will use a default hostname ``mongodb`` specified by the ``docker-compose.yml`` file. 
+- ``MONGODB_PORT`` refers to the exposed MongoDB port to the Docker host (internally the container will still use ``27017``). Use this port if you need to connect with your MongoDB database manager.
 
 
 ## Running the service
