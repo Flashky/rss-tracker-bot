@@ -9,6 +9,7 @@ import org.springframework.data.domain.PageImpl;
 
 import com.flashk.bots.rsstracker.repositories.entities.FeedEntity;
 import com.flashk.bots.rsstracker.services.model.Feed;
+import com.rometools.rome.feed.synd.SyndContent;
 import com.rometools.rome.feed.synd.SyndEntry;
 import com.rometools.rome.feed.synd.SyndFeed;
 
@@ -21,12 +22,17 @@ public abstract class FeedMapper {
 	@Mapping(target = "isEnabled", ignore = true)
 	@Mapping(target = "createdDate", ignore = true)
 	@Mapping(target = "lastModifiedDate", ignore = true)
+	@Mapping(source = "syndFeed.entries", target = "notifiedItems")
 	public abstract FeedEntity map(Long userId, Long chatId, String sourceLink, SyndFeed syndFeed);
 	public abstract Feed map(FeedEntity feedEntity, List<SyndEntry> items);
 	
 	@Mapping(target = "items", ignore = true)
 	public abstract List<Feed> map(List<FeedEntity> feedEntities);
 	
+    public String map(SyndContent content) {
+        return content.getValue();
+    }
+    
 	/**
 	 * Maps a <code>Page&lt;FeedEntity&gt;</code> to a <code>PagedResponse&lt;Feed&gt;</code>.
 	 * @param feedEntitiesPage the feed entities page to map.

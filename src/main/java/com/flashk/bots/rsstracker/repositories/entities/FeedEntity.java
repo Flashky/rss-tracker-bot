@@ -1,6 +1,8 @@
 package com.flashk.bots.rsstracker.repositories.entities;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
@@ -53,6 +55,11 @@ public class FeedEntity {
 	 * Defines if the RSS feed has Telegram notifications enabled.
 	 */
 	private Boolean isEnabled = true;
+	
+	/**
+	 * Already notified items from the feed.
+	 */
+	private List<ItemEntity> notifiedItems = new ArrayList<>();
 	
 	// Auditing fields
 	
