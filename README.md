@@ -95,25 +95,4 @@ docker run --name rss-tracker-bot --env-file .env -dp 8080:8080 flashk/rss-track
 
 ### Docker Compose
 
-#### Requirements
-
-- Docker.
-
-#### Run
-
-Command:
-
-```shell
-docker compose up
-```
-
-The previous command will setup a Docker container with MongoDB and another Docker container with the service. 
-It will use ``.env`` file by default for getting the [configuration properties](#configuration-properties).
-
-If you want to use multiple environments you can duplicate ``.env``, customize its values, and finally run ``docker compose`` specifying ``--env-file`` flag  to select which configuration to use.
-
-Example with a ``.env.dev`` file:
-
-```shell
-docker compose --env-file .env.dev up 
-```
+See [rss-tracker-app](https://github.com/Flashky/rss-tracker-app) repository.
