@@ -90,11 +90,18 @@
 		</dependency>
 
 		<!--  Testing dependencies -->
+		
 		<dependency>
 		    <groupId>uk.co.jemos.podam</groupId>
 		    <artifactId>podam</artifactId>
 		    <version>7.2.5.RELEASE</version>
 		    <scope>test</scope>
+		</dependency>
+		
+		<dependency>
+		  <groupId>com.openpojo</groupId>
+		  <artifactId>openpojo</artifactId>
+		  <version>0.9.1</version>
 		</dependency>
 		
 	</dependencies>
