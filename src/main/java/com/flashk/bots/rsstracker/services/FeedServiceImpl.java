@@ -74,4 +74,9 @@ public class FeedServiceImpl implements FeedService {
 
 	}
 
+	@Override
+	public void deleteFeed(String feedId) {
+		feedRepository.deleteById(feedId);
+	}
+
 }

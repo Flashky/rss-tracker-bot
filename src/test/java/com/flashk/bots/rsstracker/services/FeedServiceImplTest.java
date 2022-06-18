@@ -218,6 +218,19 @@ class FeedServiceImplTest {
 		
 	}
 	
+	@Test
+	void testDeleteFeed() {
+		
+		// Prepare POJOs
+		String feedId = podamFactory.manufacturePojo(String.class);
+		
+		// Execute method
+		feedService.deleteFeed(feedId);
+		
+		// Assertions
+		Mockito.verify(feedRepository).deleteById(any());
+		
+	}
 	
 	private Page<FeedEntity> manufacturePagePojo(int page, int size) {
 		

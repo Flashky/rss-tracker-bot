@@ -32,4 +32,11 @@ public interface FeedService {
 	 * @return a feed.
 	 */
 	Optional<Feed> getFeed(String feedId);
+	
+	/**
+	 * Deletes a feed.
+	 * @param feedId unique feed identifier.
+	 */
+	void deleteFeed(String feedId);
+	
 }
