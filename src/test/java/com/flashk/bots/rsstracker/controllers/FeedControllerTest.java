@@ -37,6 +37,7 @@ import com.pengrad.telegrambot.model.User;
 import com.pengrad.telegrambot.model.request.InlineKeyboardMarkup;
 import com.pengrad.telegrambot.request.SendMessage;
 
+import ch.qos.logback.classic.Level;
 import uk.co.jemos.podam.api.PodamFactory;
 import uk.co.jemos.podam.api.PodamFactoryImpl;
 
@@ -70,7 +71,7 @@ class FeedControllerTest {
 	@BeforeAll
 	static void setUpBeforeClass() throws Exception {
 		
-		Util.disablePodamLogs();
+		Util.setTestingLogLevel(Level.OFF);
 		
 	    podamFactory = new PodamFactoryImpl();
 	    podamFactory.getStrategy().setDefaultNumberOfCollectionElements(TOTAL_ELEMENTS);
