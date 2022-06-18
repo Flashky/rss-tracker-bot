@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -218,6 +219,44 @@ class FeedServiceImplTest {
 		
 	}
 	
+	@Test
+	void testDeleteFeed() {
+		
+		// Prepare POJOs
+		String feedId = podamFactory.manufacturePojo(String.class);
+		FeedEntity feedEntity = podamFactory.manufacturePojo(FeedEntity.class);
+		Optional<FeedEntity> expected = Optional.ofNullable(feedEntity);
+		
+		// Prepare mocks
+		Mockito.doReturn(expected).when(feedRepository).findById(any());
+		
+		// Execute method
+		Optional<Feed> result = feedService.deleteFeed(feedId);
+		
+		// Assertions
+		Mockito.verify(feedRepository).deleteById(any());
+		assertTrue(result.isPresent());
+		
+	}
+	
+	@Test
+	void testDeleteFeedNonExisting() {
+		
+		// Prepare POJOs
+		String feedId = podamFactory.manufacturePojo(String.class);
+		Optional<FeedEntity> expected = Optional.empty();
+		
+		// Prepare mocks
+		Mockito.doReturn(expected).when(feedRepository).findById(any());
+		
+		// Execute method
+		Optional<Feed> result = feedService.deleteFeed(feedId);
+		
+		// Assertions
+		Mockito.verify(feedRepository, times(0)).deleteById(any());
+		assertTrue(result.isEmpty());
+		
+	}
 	
 	private Page<FeedEntity> manufacturePagePojo(int page, int size) {
 		

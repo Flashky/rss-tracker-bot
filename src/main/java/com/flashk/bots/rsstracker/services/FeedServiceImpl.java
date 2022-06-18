@@ -74,4 +74,19 @@ public class FeedServiceImpl implements FeedService {
 
 	}
 
+	@Override
+	public Optional<Feed> deleteFeed(String feedId) {
+		
+		Optional<FeedEntity> feedEntity = feedRepository.findById(feedId);
+		
+		Feed deletedFeed = feedMapper.map(feedEntity.orElse(null));
+		
+		if(feedEntity.isPresent()) {
+			feedRepository.deleteById(feedId);
+			
+		}
+		
+		return Optional.ofNullable(deletedFeed);
+	}
+
 }
