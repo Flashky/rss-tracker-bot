@@ -26,6 +26,9 @@ public abstract class FeedMapper {
 	public abstract FeedEntity map(Long userId, Long chatId, String sourceLink, SyndFeed syndFeed);
 	public abstract Feed map(FeedEntity feedEntity, List<SyndEntry> items);
 	
+	@Mapping(source = "notifiedItems", target = "items")
+	public abstract Feed map(FeedEntity feedEntity);
+	
 	@Mapping(target = "items", ignore = true)
 	public abstract List<Feed> map(List<FeedEntity> feedEntities);
 	

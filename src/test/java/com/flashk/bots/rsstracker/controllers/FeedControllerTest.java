@@ -21,6 +21,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 
+import com.flashk.bots.rsstracker.controllers.mappers.DialogDeleteFeedReplyMarkupMapper;
 import com.flashk.bots.rsstracker.controllers.mappers.FeedsReplyMarkupMapper;
 import com.flashk.bots.rsstracker.controllers.mappers.ItemsReplyMarkupMapper;
 import com.flashk.bots.rsstracker.services.FeedService;
@@ -68,6 +69,9 @@ class FeedControllerTest {
 	@Mock
     private FeedsReplyMarkupMapper feedsReplyMarkupMapper;
     
+	@Mock
+	private DialogDeleteFeedReplyMarkupMapper dialogDeleteFeedReplyMarkupMapper;
+	
 	@BeforeAll
 	static void setUpBeforeClass() throws Exception {
 		
@@ -121,11 +125,7 @@ class FeedControllerTest {
 		assertNotNull(result); // A message is sent
 		
 	}
-	
-	private Page<Feed> manufacturePojoPageFeed() {
-		List<Feed> feedList = podamFactory.manufacturePojo(ArrayList.class, Feed.class);
-		return new PageImpl<Feed>(feedList, PageRequest.of(FIRST_PAGE, SIZE), TOTAL_ELEMENTS);
-	}
+
 	
 	@Test
 	void testListFeedsCallback() {
@@ -245,6 +245,79 @@ class FeedControllerTest {
 		
 		// Assertions
 		Mockito.verify(feedService).createFeed(any(), any(), any());
+	}
+	
+	@Test 
+	void testShowDeleteFeedDialog() {
+		
+		// Prepare POJOs
+		String feedId = podamFactory.manufacturePojo(String.class);
+		Optional<Feed> feed = Optional.of(podamFactory.manufacturePojo(Feed.class));
+		
+		// Prepare mocks
+		TelegramRequest request = mockTelegramRequestCallbackQuery();
+		Mockito.doReturn(feed).when(feedService).getFeed(any());
+		
+		// Execute method
+		feedController.showDeleteFeedDialog(request, feedId);
+		
+		// Assertions 
+		Mockito.verify(feedService).getFeed(any());
+	}
+	
+	@Test 
+	void testShowDeleteFeedDialogNoFeed() {
+		
+		// Prepare POJOs
+		String feedId = podamFactory.manufacturePojo(String.class);
+		
+		// Execute method
+		TelegramRequest request = mockTelegramRequestCallbackQuery();
+		feedController.showDeleteFeedDialog(request, feedId);
+				
+		// Assertions
+		Mockito.verify(feedService).getFeed(any());
+	}
+	
+	@Test
+	void testDeleteFeed() {
+					
+		// Prepare POJOs
+		String feedId = podamFactory.manufacturePojo(String.class);
+		
+		// Mocks
+		TelegramRequest request = mockTelegramRequestCallbackQuery();
+		
+		// Execute method
+		feedController.deleteFeed(request, feedId);
+		
+		// Assertions
+		Mockito.verify(feedService).deleteFeed(any());
+				
+	}
+	
+	@Test
+	void testDeleteFeedNoFeed() {
+					
+		// Prepare POJOs
+		String feedId = podamFactory.manufacturePojo(String.class);
+		Optional<Feed> feed = Optional.of(podamFactory.manufacturePojo(Feed.class));
+		
+		// Mocks
+		TelegramRequest request = mockTelegramRequestCallbackQuery();
+		Mockito.doReturn(feed).when(feedService).deleteFeed(any());
+		
+		// Execute method
+		feedController.deleteFeed(request, feedId);
+		
+		// Assertions
+		Mockito.verify(feedService).deleteFeed(any());
+				
+	}
+	
+	private Page<Feed> manufacturePojoPageFeed() {
+		List<Feed> feedList = podamFactory.manufacturePojo(ArrayList.class, Feed.class);
+		return new PageImpl<Feed>(feedList, PageRequest.of(FIRST_PAGE, SIZE), TOTAL_ELEMENTS);
 	}
 	
 	private TelegramRequest mockTelegramRequestCallbackQuery() {

@@ -9,6 +9,7 @@ import org.springframework.data.domain.Page;
 import com.flashk.bots.rsstracker.constants.MessageConstants;
 import com.flashk.bots.rsstracker.controllers.constants.CommonConstants;
 import com.flashk.bots.rsstracker.controllers.constants.PathConstants;
+import com.flashk.bots.rsstracker.controllers.mappers.DialogDeleteFeedReplyMarkupMapper;
 import com.flashk.bots.rsstracker.controllers.mappers.FeedsReplyMarkupMapper;
 import com.flashk.bots.rsstracker.controllers.mappers.ItemsReplyMarkupMapper;
 import com.flashk.bots.rsstracker.services.FeedService;
@@ -51,6 +52,9 @@ public class FeedController implements TelegramMvcController {
     
     @Autowired
     private FeedsReplyMarkupMapper feedsReplyMarkupMapper;
+    
+    @Autowired
+    private DialogDeleteFeedReplyMarkupMapper dialogDeleteFeedReplyMarkupMapper;
     
 	@Override
 	public String getToken() {
@@ -134,7 +138,8 @@ public class FeedController implements TelegramMvcController {
       	// Prepare response
     	EditMessageText message;
     	if(feed.isEmpty()) {
-    		message = new EditMessageText(chat.id(), callbackQuery.message().messageId(), "Sorry, I couldn't find that feed.");
+    		String text = messageService.getText(MessageConstants.RSS_FEED_NOT_FOUND, user.languageCode());
+    		message = new EditMessageText(chat.id(), callbackQuery.message().messageId(), text);
     	} else {
     		
     		InlineKeyboardMarkup replyMarkup = itemsReplyMarkupMapper.map(request.getUser(), feed.get(), page, size);
@@ -181,6 +186,69 @@ public class FeedController implements TelegramMvcController {
 
     }
 
+    @CallbackQueryRequest(PathConstants.URI_FEED_ACTION_DIALOG_DELETE)
+    public void showDeleteFeedDialog(TelegramRequest request, @BotPathVariable(PathConstants.FEED_ID) String feedId) {
+    	
+    	Chat chat = request.getChat();
+    	User user = request.getUser();
+    	CallbackQuery callbackQuery = request.getUpdate().callbackQuery();
+    	
+    	// Obtain feed
+    	Optional<Feed> feed = feedService.getFeed(feedId);
+    	
+    	// Prepare response
+    	EditMessageText message;
+    	if(feed.isEmpty()) {
+    		String text = messageService.getText(MessageConstants.RSS_FEED_NOT_FOUND, user.languageCode());
+    		message = new EditMessageText(chat.id(), callbackQuery.message().messageId(), text);
+    	} else {
+          	
+        	InlineKeyboardMarkup replyMarkup = dialogDeleteFeedReplyMarkupMapper.map(user, feed.get());
+        	String text = messageService.getText(MessageConstants.DIALOG_TITLE_DELETE_FEED, user.languageCode(), feed.get().getTitle());
+        	message = new EditMessageText(chat.id(), callbackQuery.message().messageId(), text)
+    				.replyMarkup(replyMarkup)
+    				.parseMode(ParseMode.Markdown);
+    	}
+    	
+    	// Reply with message
+    	request.getTelegramBot().execute(message);
+
+    	// Answer callback query
+    	request.getTelegramBot().execute(new AnswerCallbackQuery(callbackQuery.id()));
+    	
+    }
+  
+    @CallbackQueryRequest(PathConstants.URI_FEED_ACTION_DELETE)
+    public void deleteFeed(TelegramRequest request, @BotPathVariable(PathConstants.FEED_ID) String feedId) {
+    	
+    	Chat chat = request.getChat();
+    	User user = request.getUser();
+    	CallbackQuery callbackQuery = request.getUpdate().callbackQuery();
+    	
+    	// Delete feed
+    	Optional<Feed> feed = feedService.deleteFeed(feedId);
+    	
+    	// Prepare response
+    	EditMessageText message;
+    	if(feed.isEmpty()) {
+    		String text = messageService.getText(MessageConstants.RSS_FEED_NOT_FOUND, user.languageCode());
+    		message = new EditMessageText(chat.id(), callbackQuery.message().messageId(), text);
+    	} else {
+          	
+        	String text = messageService.getText(MessageConstants.MESSAGE_FEED_DELETED, user.languageCode(), feed.get().getTitle(), feed.get().getSourceLink());
+        	
+        	message = new EditMessageText(chat.id(), callbackQuery.message().messageId(), text)
+    				.parseMode(ParseMode.Markdown);
+    	}
+    	
+    	// Reply with message
+    	request.getTelegramBot().execute(message);
+
+    	// Answer callback query
+    	request.getTelegramBot().execute(new AnswerCallbackQuery(callbackQuery.id()));
+    	
+    }
+    
     /**
      * Creates a feed using the request data and sends a confirmation to the user.
      * @param request The request containing all the user, chat and message information.
