@@ -11,8 +11,8 @@ public final class PathConstants {
 	public static final String FEED_ID = "feedId";
 	
 	// Uri paths
-	public static final String URI_FEED = "/feeds/{feedId}?action={action}";
-	public static final String URI_FEED_SHOW = "/feeds/{feedId}?action=show";
+	public static final String URI_FEED_ACTION = "/feeds/{feedId}?action={action}";
+	public static final String URI_FEED_ACTION_DIALOG_DELETE = "/feeds/{feedId}?action=dialog_delete";
 	
 	public static final String URI_FEEDS = "/feeds?page={page}&size={size}";
 	public static final String URI_FEED_ITEMS = "/feeds/{feedId}/items?page={page}&size={size}";
