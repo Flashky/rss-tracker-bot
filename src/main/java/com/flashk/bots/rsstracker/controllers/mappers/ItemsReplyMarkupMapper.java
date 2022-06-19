@@ -7,9 +7,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import com.flashk.bots.rsstracker.constants.MessageConstants;
 import com.flashk.bots.rsstracker.controllers.constants.CommonConstants;
+import com.flashk.bots.rsstracker.controllers.constants.PathConstants;
 import com.flashk.bots.rsstracker.repositories.utils.PageBuilder;
 import com.flashk.bots.rsstracker.services.LocalizedMessageService;
 import com.flashk.bots.rsstracker.services.model.Feed;
@@ -43,7 +45,7 @@ public class ItemsReplyMarkupMapper {
 		}
 		
 		// Add back button
-		addBackButton(replyMarkup, user);
+		addOptionButtons(replyMarkup, user, feed);
 		
 		return replyMarkup;
 	}
@@ -93,11 +95,27 @@ public class ItemsReplyMarkupMapper {
 		
 	}
 	
-	private void addBackButton(InlineKeyboardMarkup replyMarkup, User user) {
+	private void addOptionButtons(InlineKeyboardMarkup replyMarkup, User user, Feed feed) {
 		
+
+    	// Back button
 		InlineKeyboardButton backButton = new InlineKeyboardButton(messageService.getText(MessageConstants.LABEL_BACK_FEED_LIST, user.languageCode()))
 				.callbackData(urlBuilder.getFeedsUri(CommonConstants.FIRST_PAGE, pageSize));
 		
-		replyMarkup.addRow(backButton);
+		
+		// Delete button
+		String dialogDeleteUri = UriComponentsBuilder.fromPath(PathConstants.URI_FEED_ACTION_DIALOG_DELETE)
+				.buildAndExpand(feed.getId())
+				.toString();
+		
+		InlineKeyboardButton deleteButton = new InlineKeyboardButton(messageService.getText(MessageConstants.LABEL_BUTTON_DELETE_FEED, user.languageCode()))
+				.callbackData(dialogDeleteUri);
+		
+    	InlineKeyboardButton[] optionButtons = {
+    			backButton,
+    			deleteButton
+    	};
+    	
+		replyMarkup.addRow(optionButtons);
 	}
 }
