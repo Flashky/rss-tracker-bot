@@ -218,6 +218,36 @@ public class FeedController implements TelegramMvcController {
     	
     }
   
+    @CallbackQueryRequest(PathConstants.URI_FEED_ACTION_DELETE)
+    public void deleteFeed(TelegramRequest request, @BotPathVariable(PathConstants.FEED_ID) String feedId) {
+    	
+    	Chat chat = request.getChat();
+    	User user = request.getUser();
+    	CallbackQuery callbackQuery = request.getUpdate().callbackQuery();
+    	
+    	// Delete feed
+    	Optional<Feed> feed = feedService.deleteFeed(feedId);
+    	
+    	// Prepare response
+    	EditMessageText message;
+    	if(feed.isEmpty()) {
+    		String text = messageService.getText(MessageConstants.RSS_FEED_NOT_FOUND, user.languageCode());
+    		message = new EditMessageText(chat.id(), callbackQuery.message().messageId(), text);
+    	} else {
+          	
+        	String text = messageService.getText(MessageConstants.MESSAGE_FEED_DELETED, user.languageCode(), feed.get().getTitle(), feed.get().getSourceLink());
+        	
+        	message = new EditMessageText(chat.id(), callbackQuery.message().messageId(), text)
+    				.parseMode(ParseMode.Markdown);
+    	}
+    	
+    	// Reply with message
+    	request.getTelegramBot().execute(message);
+
+    	// Answer callback query
+    	request.getTelegramBot().execute(new AnswerCallbackQuery(callbackQuery.id()));
+    	
+    }
     
     /**
      * Creates a feed using the request data and sends a confirmation to the user.

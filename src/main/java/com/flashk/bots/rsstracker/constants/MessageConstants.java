@@ -15,6 +15,9 @@ public final class MessageConstants {
 	// Dialog titles
 	public static final String DIALOG_TITLE_DELETE_FEED="dialog.title.delete.feed";
 	
+	// Information messages
+	public static final String MESSAGE_FEED_DELETED = "message.feed.deleted";
+	
 	// Feed items
 	public static final String RSS_FEED_ITEM_LIST_TITLE = "rss.feed.item.list.title";
 	
