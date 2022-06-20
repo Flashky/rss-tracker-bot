@@ -7,13 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import com.flashk.bots.rsstracker.constants.MessageConstants;
-import com.flashk.bots.rsstracker.controllers.constants.CommonConstants;
-import com.flashk.bots.rsstracker.controllers.constants.PathConstants;
 import com.flashk.bots.rsstracker.repositories.utils.PageBuilder;
-import com.flashk.bots.rsstracker.services.LocalizedMessageService;
 import com.flashk.bots.rsstracker.services.model.Feed;
 import com.flashk.bots.rsstracker.services.model.Item;
 import com.pengrad.telegrambot.model.User;
@@ -23,14 +19,11 @@ import com.pengrad.telegrambot.model.request.InlineKeyboardMarkup;
 @Component
 public class ItemsReplyMarkupMapper {
 
+	@Autowired 
+	private InlineKeyboardButtonFactory buttonFactory;
+	
     @Value("${bot.feeds.page-size}")
     private int pageSize;
-    
-    @Autowired
-    private LocalizedMessageService messageService;
-    
-	@Autowired
-	private UrlBuilder urlBuilder;
 	
 	public InlineKeyboardMarkup map(User user, Feed feed, int itemPage, int size) {
 		
@@ -53,12 +46,7 @@ public class ItemsReplyMarkupMapper {
 	private void addItems(InlineKeyboardMarkup replyMarkup, Page<Item> itemData) {
 		
 		for(Item item : itemData.getContent()) {
-			
-			InlineKeyboardButton button = new InlineKeyboardButton(item.getTitle())
-											.url(item.getLink());
-			
-			replyMarkup.addRow(button);
-			
+			replyMarkup.addRow(new InlineKeyboardButton(item.getTitle()).url(item.getLink()));
 		}
 	}
 	
@@ -67,22 +55,12 @@ public class ItemsReplyMarkupMapper {
 		List<InlineKeyboardButton> paginationButtons = new ArrayList<>();
 		
 		if(items.hasPrevious()) {
-			
-			InlineKeyboardButton button = new InlineKeyboardButton(messageService.getText(MessageConstants.LABEL_PREVIOUS_PAGE, user.languageCode()))
-					.callbackData(urlBuilder.getFeedItemsUri(feed.getId(), items.previousPageable().getPageNumber(), items.getSize()));
-			
-			paginationButtons.add(button);
-			
+			paginationButtons.add(buttonFactory.createPreviousItemPageButton(user, feed, items));
 		}
 		
 		
 		if(items.hasNext()) {
-			
-			InlineKeyboardButton button = new InlineKeyboardButton(messageService.getText(MessageConstants.LABEL_NEXT_PAGE, user.languageCode()))
-					.callbackData(urlBuilder.getFeedItemsUri(feed.getId(), items.nextPageable().getPageNumber(), items.getSize()));		
-			
-			paginationButtons.add(button);
-			
+			paginationButtons.add(buttonFactory.createNextItemPageButton(user, feed, items));
 		}
 		
 		
@@ -96,24 +74,10 @@ public class ItemsReplyMarkupMapper {
 	}
 	
 	private void addOptionButtons(InlineKeyboardMarkup replyMarkup, User user, Feed feed) {
-		
 
-    	// Back button
-		InlineKeyboardButton backButton = new InlineKeyboardButton(messageService.getText(MessageConstants.LABEL_BACK_FEED_LIST, user.languageCode()))
-				.callbackData(urlBuilder.getFeedsUri(CommonConstants.FIRST_PAGE, pageSize));
-		
-		
-		// Delete button
-		String dialogDeleteUri = UriComponentsBuilder.fromPath(PathConstants.URI_FEED_ACTION_DIALOG_DELETE)
-				.buildAndExpand(feed.getId())
-				.toString();
-		
-		InlineKeyboardButton deleteButton = new InlineKeyboardButton(messageService.getText(MessageConstants.LABEL_BUTTON_DELETE_FEED, user.languageCode()))
-				.callbackData(dialogDeleteUri);
-		
     	InlineKeyboardButton[] optionButtons = {
-    			backButton,
-    			deleteButton
+    			buttonFactory.createFirstFeedPageButton(MessageConstants.LABEL_BACK_FEED_LIST, user),
+    			buttonFactory.createOpenDialogDeleteFeedButton(user, feed)
     	};
     	
 		replyMarkup.addRow(optionButtons);

@@ -18,7 +18,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 
-import com.flashk.bots.rsstracker.services.LocalizedMessageService;
 import com.flashk.bots.rsstracker.services.model.Feed;
 import com.flashk.bots.rsstracker.test.utils.Util;
 import com.pengrad.telegrambot.model.User;
@@ -45,11 +44,8 @@ class FeedsReplyMarkupMapperTest {
 	@InjectMocks
 	private FeedsReplyMarkupMapper feedReplyMarkupMapper = new FeedsReplyMarkupMapper();
 	
-	@Mock
-	private LocalizedMessageService messageService;
-	
-	@Spy
-	private UrlBuilder urlBuilder;
+	@Mock 
+	private InlineKeyboardButtonFactory buttonFactory;
 	
 	
 	@BeforeAll
