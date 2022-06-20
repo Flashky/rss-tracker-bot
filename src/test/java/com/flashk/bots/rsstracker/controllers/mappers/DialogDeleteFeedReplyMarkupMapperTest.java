@@ -11,7 +11,6 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.flashk.bots.rsstracker.services.LocalizedMessageService;
 import com.flashk.bots.rsstracker.services.model.Feed;
 import com.flashk.bots.rsstracker.test.utils.Util;
 import com.pengrad.telegrambot.model.User;
@@ -30,11 +29,8 @@ class DialogDeleteFeedReplyMarkupMapperTest {
 	@InjectMocks
 	private DialogDeleteFeedReplyMarkupMapper dialogDeleteFeedReplyMarkupMapper;
 	
-	@Mock
-	private LocalizedMessageService messageService;
-	
-	@Spy
-	private UrlBuilder urlBuilder;
+	@Mock 
+	private InlineKeyboardButtonFactory buttonFactory;
 	
 	@BeforeAll
 	static void setUpBeforeClass() throws Exception {
