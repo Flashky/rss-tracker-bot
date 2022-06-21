@@ -1,5 +1,7 @@
 package com.flashk.bots.rsstracker.controllers.mappers;
 
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -42,20 +44,28 @@ public class InlineKeyboardButtonFactory {
     	return new InlineKeyboardButton(text).callbackData(callbackData);
     }
 
-    public InlineKeyboardButton createPreviousFeedPageButton(User user, Page<Feed> feedPage) {
+    public Optional<InlineKeyboardButton> createPreviousFeedPageButton(User user, Page<Feed> feedPage) {
      	
+    	if(!feedPage.hasPrevious()) {
+    		return Optional.empty();
+    	}
+    	
     	String text = messageService.getText(MessageConstants.LABEL_PREVIOUS_PAGE, user.languageCode());
     	String callbackData = callbackDataFeedPage(feedPage.previousPageable().getPageNumber());
      	
-    	return new InlineKeyboardButton(text).callbackData(callbackData);
+    	return Optional.of(new InlineKeyboardButton(text).callbackData(callbackData));
     }
     
-    public InlineKeyboardButton createNextFeedPageButton(User user, Page<Feed> feedPage) {
+    public Optional<InlineKeyboardButton> createNextFeedPageButton(User user, Page<Feed> feedPage) {
      	
+    	if(!feedPage.hasNext()) {
+    		return Optional.empty();
+    	}
+    	
     	String text = messageService.getText(MessageConstants.LABEL_NEXT_PAGE, user.languageCode());
     	String callbackData = callbackDataFeedPage(feedPage.nextPageable().getPageNumber());
      	
-    	return new InlineKeyboardButton(text).callbackData(callbackData);
+    	return Optional.of(new InlineKeyboardButton(text).callbackData(callbackData));
     }
     
     public InlineKeyboardButton createOpenDialogDeleteFeedButton(User user, Feed feed) {
@@ -70,7 +80,11 @@ public class InlineKeyboardButtonFactory {
     
     // Feed Items- /feeds/{feedId}/items
     
-    public InlineKeyboardButton createShowItemsFirstPageButton(Feed feed) {
+    public InlineKeyboardButton createItemUrlButton(Item item) {
+    	return new InlineKeyboardButton(item.getTitle()).url(item.getLink());
+    }
+    
+    public InlineKeyboardButton createFirstItemPageButton(Feed feed) {
     	
     	String text = feed.getTitle();
     	String callbackData = callbackDataItemPage(feed.getId(), CommonConstants.FIRST_PAGE);
@@ -78,20 +92,36 @@ public class InlineKeyboardButtonFactory {
     	return new InlineKeyboardButton(text).callbackData(callbackData);
     }
    
-    public InlineKeyboardButton createPreviousItemPageButton(User user, Feed feed, Page<Item> itemPage) {
+    public InlineKeyboardButton createFirstItemPageButton(String label, User user, Feed feed) {
     	
-    	String text = messageService.getText(MessageConstants.LABEL_PREVIOUS_PAGE, user.languageCode());
-    	String callbackData = callbackDataItemPage(feed.getId(), itemPage.previousPageable().getPageNumber());
+    	String text = messageService.getText(label, user.languageCode());
+    	String callbackData = callbackDataItemPage(feed.getId(), CommonConstants.FIRST_PAGE);
     	
     	return new InlineKeyboardButton(text).callbackData(callbackData);
     }
     
-    public InlineKeyboardButton createNextItemPageButton(User user, Feed feed, Page<Item> itemPage) {
+    public Optional<InlineKeyboardButton> createPreviousItemPageButton(User user, Feed feed, Page<Item> itemPage) {
+    	
+    	if(!itemPage.hasPrevious()) {
+    		return Optional.empty();
+    	};
+    	
+    	String text = messageService.getText(MessageConstants.LABEL_PREVIOUS_PAGE, user.languageCode());
+    	String callbackData = callbackDataItemPage(feed.getId(), itemPage.previousPageable().getPageNumber());
+    	
+    	return Optional.of(new InlineKeyboardButton(text).callbackData(callbackData));
+    }
+    
+    public Optional<InlineKeyboardButton> createNextItemPageButton(User user, Feed feed, Page<Item> itemPage) {
+    	
+    	if(!itemPage.hasNext()) {
+    		return Optional.empty();
+    	};
     	
     	String text = messageService.getText(MessageConstants.LABEL_NEXT_PAGE, user.languageCode());
     	String callbackData = callbackDataItemPage(feed.getId(), itemPage.nextPageable().getPageNumber());
     	
-    	return new InlineKeyboardButton(text).callbackData(callbackData);
+    	return Optional.of(new InlineKeyboardButton(text).callbackData(callbackData));
     }
     
 	public InlineKeyboardButton createDeleteFeedButton(User user, Feed feed) {
