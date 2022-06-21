@@ -9,9 +9,7 @@ import org.springframework.data.domain.Page;
 import com.flashk.bots.rsstracker.constants.MessageConstants;
 import com.flashk.bots.rsstracker.controllers.constants.CommonConstants;
 import com.flashk.bots.rsstracker.controllers.constants.PathConstants;
-import com.flashk.bots.rsstracker.controllers.mappers.DialogDeleteFeedReplyMarkupMapper;
-import com.flashk.bots.rsstracker.controllers.mappers.FeedsReplyMarkupMapper;
-import com.flashk.bots.rsstracker.controllers.mappers.ItemsReplyMarkupMapper;
+import com.flashk.bots.rsstracker.controllers.mappers.ReplyMarkupFactory;
 import com.flashk.bots.rsstracker.services.FeedService;
 import com.flashk.bots.rsstracker.services.LocalizedMessageService;
 import com.flashk.bots.rsstracker.services.model.Feed;
@@ -48,13 +46,7 @@ public class FeedController implements TelegramMvcController {
     private LocalizedMessageService messageService;
     
     @Autowired
-    private ItemsReplyMarkupMapper itemsReplyMarkupMapper;
-    
-    @Autowired
-    private FeedsReplyMarkupMapper feedsReplyMarkupMapper;
-    
-    @Autowired
-    private DialogDeleteFeedReplyMarkupMapper dialogDeleteFeedReplyMarkupMapper;
+    private ReplyMarkupFactory replyMarkupFactory;
     
 	@Override
 	public String getToken() {
@@ -68,7 +60,7 @@ public class FeedController implements TelegramMvcController {
 		Page<Feed> feeds = feedService.listFeeds(user.id(), CommonConstants.FIRST_PAGE, pageSize);
 		
 		// Prepare response
-		Optional<InlineKeyboardMarkup> replyMarkup = feedsReplyMarkupMapper.map(user, feeds);
+		Optional<InlineKeyboardMarkup> replyMarkup = replyMarkupFactory.createFeedPage(user, feeds);
 		
 		if(replyMarkup.isEmpty()) {
 		
@@ -97,7 +89,7 @@ public class FeedController implements TelegramMvcController {
     	Page<Feed> feeds = feedService.listFeeds(user.id(), page, size);
     	
     	// Prepare response
-    	Optional<InlineKeyboardMarkup> replyMarkup = feedsReplyMarkupMapper.map(user, feeds);
+    	Optional<InlineKeyboardMarkup> replyMarkup = replyMarkupFactory.createFeedPage(user, feeds);
     	
     	EditMessageText message;
     	if(replyMarkup.isEmpty()) {
@@ -142,7 +134,7 @@ public class FeedController implements TelegramMvcController {
     		message = new EditMessageText(chat.id(), callbackQuery.message().messageId(), text);
     	} else {
     		
-    		InlineKeyboardMarkup replyMarkup = itemsReplyMarkupMapper.map(request.getUser(), feed.get(), page, size);
+    		InlineKeyboardMarkup replyMarkup = replyMarkupFactory.createItemPage(request.getUser(), feed.get(), page, size);
         	
         	String text = messageService.getText(MessageConstants.RSS_FEED_ITEM_LIST_TITLE, user.languageCode(), feed.get().getTitle());
         	message = new EditMessageText(chat.id(), callbackQuery.message().messageId(), text)
@@ -203,7 +195,7 @@ public class FeedController implements TelegramMvcController {
     		message = new EditMessageText(chat.id(), callbackQuery.message().messageId(), text);
     	} else {
           	
-        	InlineKeyboardMarkup replyMarkup = dialogDeleteFeedReplyMarkupMapper.map(user, feed.get());
+        	InlineKeyboardMarkup replyMarkup = replyMarkupFactory.createDialogDeleteFeed(user, feed.get());
         	String text = messageService.getText(MessageConstants.DIALOG_TITLE_DELETE_FEED, user.languageCode(), feed.get().getTitle());
         	message = new EditMessageText(chat.id(), callbackQuery.message().messageId(), text)
     				.replyMarkup(replyMarkup)
@@ -261,7 +253,7 @@ public class FeedController implements TelegramMvcController {
 											request.getMessage().text());
 
 		// Bot response
-    	InlineKeyboardMarkup replyMarkup = itemsReplyMarkupMapper.map(request.getUser(), feed, CommonConstants.FIRST_PAGE, pageSize);
+    	InlineKeyboardMarkup replyMarkup = replyMarkupFactory.createItemPage(request.getUser(), feed, CommonConstants.FIRST_PAGE, pageSize);
     	
     	SendMessage response = new SendMessage(request.getChat().id(), messageService.getText(MessageConstants.RSS_FEED_ADD_SUCCESS, request.getUser().languageCode(), feed.getTitle()))
     				.replyMarkup(replyMarkup)
