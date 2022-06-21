@@ -1,6 +1,8 @@
 package com.flashk.bots.rsstracker.controllers.mappers;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
@@ -21,6 +24,7 @@ import org.springframework.data.domain.PageRequest;
 import com.flashk.bots.rsstracker.services.model.Feed;
 import com.flashk.bots.rsstracker.test.utils.Util;
 import com.pengrad.telegrambot.model.User;
+import com.pengrad.telegrambot.model.request.InlineKeyboardButton;
 import com.pengrad.telegrambot.model.request.InlineKeyboardMarkup;
 
 import ch.qos.logback.classic.Level;
@@ -52,7 +56,7 @@ class ReplyMarkupFactoryTest {
 		Util.setTestingLogLevel(Level.OFF);
 		
 	    podamFactory = new PodamFactoryImpl();
-	    podamFactory.getStrategy().setDefaultNumberOfCollectionElements(2);
+	    podamFactory.getStrategy().setDefaultNumberOfCollectionElements(TOTAL_ELEMENTS);
 	}
 
 	@BeforeEach
@@ -127,9 +131,15 @@ class ReplyMarkupFactoryTest {
 	@Test
 	void testCreateItemPage() {
 		
-		// Prepare mocks
+		// Prepare POJOs
 		User user = new User(23L);
 		Feed feed = podamFactory.manufacturePojo(Feed.class);
+		Optional<InlineKeyboardButton> previousPageButton = Optional.of(podamFactory.manufacturePojo(InlineKeyboardButton.class));
+		Optional<InlineKeyboardButton> nextPageButton = Optional.of(podamFactory.manufacturePojo(InlineKeyboardButton.class));
+		
+		// Mocks
+		Mockito.lenient().doReturn(previousPageButton).when(buttonFactory).createPreviousItemPageButton(any(), any(), any());
+		Mockito.lenient().doReturn(nextPageButton).when(buttonFactory).createNextItemPageButton(any(), any(), any());
 		
 		// Execute method
 		InlineKeyboardMarkup result = replyMarkupFactory.createItemPage(user, feed, SECOND_PAGE, SIZE);
@@ -142,9 +152,13 @@ class ReplyMarkupFactoryTest {
 	@Test
 	void testCreateItemPageFirstPage() {
 		
-		// Prepare mocks
+		// Prepare POJOs
 		User user = new User(23L);
 		Feed feed = podamFactory.manufacturePojo(Feed.class);
+		Optional<InlineKeyboardButton> nextPageButton = Optional.of(podamFactory.manufacturePojo(InlineKeyboardButton.class));
+		
+		// Mocks
+		Mockito.doReturn(nextPageButton).when(buttonFactory).createNextItemPageButton(any(), any(), any());
 		
 		// Execute method
 		InlineKeyboardMarkup result = replyMarkupFactory.createItemPage(user, feed, FIRST_PAGE, SIZE);
@@ -157,9 +171,13 @@ class ReplyMarkupFactoryTest {
 	@Test
 	void testCreateItemPageLastPage() {
 		
-		// Prepare mocks
+		// Prepare POJOs
 		User user = new User(23L);
 		Feed feed = podamFactory.manufacturePojo(Feed.class);
+		Optional<InlineKeyboardButton> previousPageButton = Optional.of(podamFactory.manufacturePojo(InlineKeyboardButton.class));
+		
+		// Mocks
+		Mockito.doReturn(previousPageButton).when(buttonFactory).createPreviousItemPageButton(any(), any(), any());
 		
 		// Execute method
 		InlineKeyboardMarkup result = replyMarkupFactory.createItemPage(user, feed, LAST_PAGE, SIZE);
