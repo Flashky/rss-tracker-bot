@@ -116,7 +116,7 @@ public class InlineKeyboardButtonFactory {
     	
     	if(!itemPage.hasNext()) {
     		return Optional.empty();
-    	};
+    	}
     	
     	String text = messageService.getText(MessageConstants.LABEL_NEXT_PAGE, user.languageCode());
     	String callbackData = callbackDataItemPage(feed.getId(), itemPage.nextPageable().getPageNumber());
