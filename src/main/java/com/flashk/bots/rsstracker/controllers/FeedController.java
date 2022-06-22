@@ -120,24 +120,19 @@ public class FeedController implements TelegramMvcController {
 											@BotPathVariable(PathConstants.QUERY_PAGE) Integer page, 
 											@BotPathVariable(PathConstants.QUERY_SIZE) Integer size) {
     	
-    	Chat chat = request.getChat();
-    	User user = request.getUser();
-    	CallbackQuery callbackQuery = request.getUpdate().callbackQuery();
-    	
-    	// Obtain feed
+    	// Obtain feed  	
     	Optional<Feed> feed = feedService.getFeed(feedId);
     	
       	// Prepare response
     	EditMessageText message;
     	if(feed.isEmpty()) {
-    		String text = messageService.getText(MessageConstants.RSS_FEED_NOT_FOUND, user.languageCode());
-    		message = new EditMessageText(chat.id(), callbackQuery.message().messageId(), text);
+    		message = getRssNotFoundEditMessageText(request);
     	} else {
-    		
+    		User user = request.getUser();
     		InlineKeyboardMarkup replyMarkup = replyMarkupFactory.createItemPage(request.getUser(), feed.get(), page, size);
         	
         	String text = messageService.getText(MessageConstants.RSS_FEED_ITEM_LIST_TITLE, user.languageCode(), feed.get().getTitle());
-        	message = new EditMessageText(chat.id(), callbackQuery.message().messageId(), text)
+        	message = new EditMessageText(request.getChat().id(), request.getUpdate().callbackQuery().message().messageId(), text)
         				.replyMarkup(replyMarkup)
         				.parseMode(ParseMode.Markdown);
     	}
@@ -146,7 +141,7 @@ public class FeedController implements TelegramMvcController {
     	request.getTelegramBot().execute(message);
     	
     	// Answer callback query
-    	request.getTelegramBot().execute(new AnswerCallbackQuery(callbackQuery.id()));
+    	request.getTelegramBot().execute(new AnswerCallbackQuery(request.getUpdate().callbackQuery().id()));
     	
   
     	
@@ -181,23 +176,19 @@ public class FeedController implements TelegramMvcController {
     @CallbackQueryRequest(PathConstants.URI_FEED_ACTION_DIALOG_DELETE)
     public void showDeleteFeedDialog(TelegramRequest request, @BotPathVariable(PathConstants.FEED_ID) String feedId) {
     	
-    	Chat chat = request.getChat();
-    	User user = request.getUser();
-    	CallbackQuery callbackQuery = request.getUpdate().callbackQuery();
-    	
     	// Obtain feed
     	Optional<Feed> feed = feedService.getFeed(feedId);
     	
     	// Prepare response
     	EditMessageText message;
     	if(feed.isEmpty()) {
-    		String text = messageService.getText(MessageConstants.RSS_FEED_NOT_FOUND, user.languageCode());
-    		message = new EditMessageText(chat.id(), callbackQuery.message().messageId(), text);
+    		message = getRssNotFoundEditMessageText(request);
     	} else {
           	
+    		User user = request.getUser();
         	InlineKeyboardMarkup replyMarkup = replyMarkupFactory.createDialogDeleteFeed(user, feed.get());
         	String text = messageService.getText(MessageConstants.DIALOG_TITLE_DELETE_FEED, user.languageCode(), feed.get().getTitle());
-        	message = new EditMessageText(chat.id(), callbackQuery.message().messageId(), text)
+        	message = new EditMessageText(request.getChat().id(), request.getUpdate().callbackQuery().message().messageId(), text)
     				.replyMarkup(replyMarkup)
     				.parseMode(ParseMode.Markdown);
     	}
@@ -206,7 +197,7 @@ public class FeedController implements TelegramMvcController {
     	request.getTelegramBot().execute(message);
 
     	// Answer callback query
-    	request.getTelegramBot().execute(new AnswerCallbackQuery(callbackQuery.id()));
+    	request.getTelegramBot().execute(new AnswerCallbackQuery(request.getUpdate().callbackQuery().id()));
     	
     }
   
@@ -223,8 +214,7 @@ public class FeedController implements TelegramMvcController {
     	// Prepare response
     	EditMessageText message;
     	if(feed.isEmpty()) {
-    		String text = messageService.getText(MessageConstants.RSS_FEED_NOT_FOUND, user.languageCode());
-    		message = new EditMessageText(chat.id(), callbackQuery.message().messageId(), text);
+    		message = getRssNotFoundEditMessageText(request);
     	} else {
           	
         	String text = messageService.getText(MessageConstants.MESSAGE_FEED_DELETED, user.languageCode(), feed.get().getTitle(), feed.get().getSourceLink());
@@ -260,5 +250,10 @@ public class FeedController implements TelegramMvcController {
     				.parseMode(ParseMode.Markdown);
 		
 		request.getTelegramBot().execute(response);
+	}
+	
+	private EditMessageText getRssNotFoundEditMessageText(TelegramRequest request) {
+		String text = messageService.getText(MessageConstants.RSS_FEED_NOT_FOUND, request.getUser().languageCode());
+		return new EditMessageText(request.getChat().id(), request.getUpdate().callbackQuery().message().messageId(), text);
 	}
 }
