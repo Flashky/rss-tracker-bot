@@ -21,9 +21,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 
-import com.flashk.bots.rsstracker.controllers.mappers.DialogDeleteFeedReplyMarkupMapper;
-import com.flashk.bots.rsstracker.controllers.mappers.FeedsReplyMarkupMapper;
-import com.flashk.bots.rsstracker.controllers.mappers.ItemsReplyMarkupMapper;
+import com.flashk.bots.rsstracker.controllers.mappers.ReplyMarkupFactory;
 import com.flashk.bots.rsstracker.services.FeedService;
 import com.flashk.bots.rsstracker.services.LocalizedMessageService;
 import com.flashk.bots.rsstracker.services.model.Feed;
@@ -64,13 +62,7 @@ class FeedControllerTest {
     private LocalizedMessageService messageService;
     
 	@Mock
-    private ItemsReplyMarkupMapper itemsReplyMarkupMapper;
-    
-	@Mock
-    private FeedsReplyMarkupMapper feedsReplyMarkupMapper;
-    
-	@Mock
-	private DialogDeleteFeedReplyMarkupMapper dialogDeleteFeedReplyMarkupMapper;
+    private ReplyMarkupFactory replyMarkupFactory;
 	
 	@BeforeAll
 	static void setUpBeforeClass() throws Exception {
@@ -97,7 +89,7 @@ class FeedControllerTest {
 		
 		// Mocks
 		Mockito.doReturn(feedsPage).when(feedService).listFeeds(any(), anyInt(), anyInt());
-		Mockito.doReturn(replyMarkup).when(feedsReplyMarkupMapper).map(any(), any());
+		Mockito.doReturn(replyMarkup).when(replyMarkupFactory).createFeedPage(any(), any());
 		
 		// Execute method
 		SendMessage result = feedController.listFeeds(user, chat);
@@ -138,7 +130,7 @@ class FeedControllerTest {
 		TelegramRequest request = mockTelegramRequestCallbackQuery();
 		
 		Mockito.doReturn(feedsPage).when(feedService).listFeeds(any(), anyInt(), anyInt());
-		Mockito.doReturn(replyMarkup).when(feedsReplyMarkupMapper).map(any(), any());
+		Mockito.doReturn(replyMarkup).when(replyMarkupFactory).createFeedPage(any(), any());
 		
 		// Execute method
 		feedController.listFeedsCallback(request, FIRST_PAGE, SIZE);
@@ -175,7 +167,7 @@ class FeedControllerTest {
 		TelegramRequest request = mockTelegramRequestCallbackQuery();
 		
 		Mockito.doReturn(feed).when(feedService).getFeed(any());
-		Mockito.doReturn(replyMarkup).when(itemsReplyMarkupMapper).map(any(), any(), anyInt(), anyInt());
+		Mockito.doReturn(replyMarkup).when(replyMarkupFactory).createItemPage(any(), any(), anyInt(), anyInt());
 		
 		
 		// Execute method
@@ -271,12 +263,16 @@ class FeedControllerTest {
 		// Prepare POJOs
 		String feedId = podamFactory.manufacturePojo(String.class);
 		
-		// Execute method
+		// Mocks
 		TelegramRequest request = mockTelegramRequestCallbackQuery();
+		
+		// Execute method
 		feedController.showDeleteFeedDialog(request, feedId);
-				
+		
+ 				
 		// Assertions
 		Mockito.verify(feedService).getFeed(any());
+
 	}
 	
 	@Test
