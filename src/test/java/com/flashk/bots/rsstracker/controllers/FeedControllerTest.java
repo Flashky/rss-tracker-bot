@@ -263,12 +263,16 @@ class FeedControllerTest {
 		// Prepare POJOs
 		String feedId = podamFactory.manufacturePojo(String.class);
 		
-		// Execute method
+		// Mocks
 		TelegramRequest request = mockTelegramRequestCallbackQuery();
+		
+		// Execute method
 		feedController.showDeleteFeedDialog(request, feedId);
-				
+		
+ 				
 		// Assertions
 		Mockito.verify(feedService).getFeed(any());
+
 	}
 	
 	@Test

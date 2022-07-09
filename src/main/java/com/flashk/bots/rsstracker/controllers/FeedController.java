@@ -106,11 +106,7 @@ public class FeedController implements TelegramMvcController {
  
     	}
     	
-    	// Reply with message
-    	request.getTelegramBot().execute(message);
-    	
-    	// Answer callback query
-    	request.getTelegramBot().execute(new AnswerCallbackQuery(callbackQuery.id()));
+    	replyCallBackQueryWithEditMessageText(request, message);
     	
     }
     
@@ -130,20 +126,11 @@ public class FeedController implements TelegramMvcController {
     	} else {
     		User user = request.getUser();
     		InlineKeyboardMarkup replyMarkup = replyMarkupFactory.createItemPage(request.getUser(), feed.get(), page, size);
-        	
-        	String text = messageService.getText(MessageConstants.RSS_FEED_ITEM_LIST_TITLE, user.languageCode(), feed.get().getTitle());
-        	message = new EditMessageText(request.getChat().id(), request.getUpdate().callbackQuery().message().messageId(), text)
-        				.replyMarkup(replyMarkup)
-        				.parseMode(ParseMode.Markdown);
+    		String text = messageService.getText(MessageConstants.RSS_FEED_ITEM_LIST_TITLE, user.languageCode(), feed.get().getTitle());
+        	message = getEditMessageText(request, text, replyMarkup);
     	}
 
-    	// Reply with message
-    	request.getTelegramBot().execute(message);
-    	
-    	// Answer callback query
-    	request.getTelegramBot().execute(new AnswerCallbackQuery(request.getUpdate().callbackQuery().id()));
-    	
-  
+    	replyCallBackQueryWithEditMessageText(request, message);
     	
     }
 	
@@ -188,16 +175,10 @@ public class FeedController implements TelegramMvcController {
     		User user = request.getUser();
         	InlineKeyboardMarkup replyMarkup = replyMarkupFactory.createDialogDeleteFeed(user, feed.get());
         	String text = messageService.getText(MessageConstants.DIALOG_TITLE_DELETE_FEED, user.languageCode(), feed.get().getTitle());
-        	message = new EditMessageText(request.getChat().id(), request.getUpdate().callbackQuery().message().messageId(), text)
-    				.replyMarkup(replyMarkup)
-    				.parseMode(ParseMode.Markdown);
+        	message = getEditMessageText(request, text, replyMarkup);
     	}
     	
-    	// Reply with message
-    	request.getTelegramBot().execute(message);
-
-    	// Answer callback query
-    	request.getTelegramBot().execute(new AnswerCallbackQuery(request.getUpdate().callbackQuery().id()));
+    	replyCallBackQueryWithEditMessageText(request, message);
     	
     }
   
@@ -223,11 +204,7 @@ public class FeedController implements TelegramMvcController {
     				.parseMode(ParseMode.Markdown);
     	}
     	
-    	// Reply with message
-    	request.getTelegramBot().execute(message);
-
-    	// Answer callback query
-    	request.getTelegramBot().execute(new AnswerCallbackQuery(callbackQuery.id()));
+    	replyCallBackQueryWithEditMessageText(request, message);
     	
     }
     
@@ -255,5 +232,26 @@ public class FeedController implements TelegramMvcController {
 	private EditMessageText getRssNotFoundEditMessageText(TelegramRequest request) {
 		String text = messageService.getText(MessageConstants.RSS_FEED_NOT_FOUND, request.getUser().languageCode());
 		return new EditMessageText(request.getChat().id(), request.getUpdate().callbackQuery().message().messageId(), text);
+	}
+	
+
+	private EditMessageText getEditMessageText(TelegramRequest request, String text, InlineKeyboardMarkup replyMarkup) {
+		EditMessageText message;
+		
+		message = new EditMessageText(request.getChat().id(), request.getUpdate().callbackQuery().message().messageId(), text)
+					.replyMarkup(replyMarkup)
+					.parseMode(ParseMode.Markdown);
+		
+		return message;
+	}
+	
+	private void replyCallBackQueryWithEditMessageText(TelegramRequest request, EditMessageText message) {
+		
+		// Reply with message
+    	request.getTelegramBot().execute(message);
+
+    	// Answer callback query
+    	request.getTelegramBot().execute(new AnswerCallbackQuery(request.getUpdate().callbackQuery().id()));
+    	
 	}
 }
