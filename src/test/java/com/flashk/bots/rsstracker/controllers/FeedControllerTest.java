@@ -21,6 +21,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 
+import com.flashk.bots.rsstracker.controllers.mappers.MessageFactory;
 import com.flashk.bots.rsstracker.controllers.mappers.ReplyMarkupFactory;
 import com.flashk.bots.rsstracker.services.FeedService;
 import com.flashk.bots.rsstracker.services.LocalizedMessageService;
@@ -33,7 +34,6 @@ import com.pengrad.telegrambot.model.Chat;
 import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.model.User;
-import com.pengrad.telegrambot.model.request.InlineKeyboardMarkup;
 import com.pengrad.telegrambot.request.SendMessage;
 
 import ch.qos.logback.classic.Level;
@@ -62,6 +62,9 @@ class FeedControllerTest {
     private LocalizedMessageService messageService;
     
 	@Mock
+	private MessageFactory messageFactory;
+	
+	@Mock
     private ReplyMarkupFactory replyMarkupFactory;
 	
 	@BeforeAll
@@ -85,17 +88,18 @@ class FeedControllerTest {
 		User user = new User(23L);
 		Chat chat = new Chat();
 		Page<Feed> feedsPage = manufacturePojoPageFeed();
-		Optional<InlineKeyboardMarkup> replyMarkup = Optional.of(new InlineKeyboardMarkup());
+		SendMessage expected = podamFactory.manufacturePojo(SendMessage.class);
 		
 		// Mocks
 		Mockito.doReturn(feedsPage).when(feedService).listFeeds(any(), anyInt(), anyInt());
-		Mockito.doReturn(replyMarkup).when(replyMarkupFactory).createFeedPage(any(), any());
+		Mockito.doReturn(expected).when(messageFactory).createFeedListSendMessage(any(), any(), any());
 		
 		// Execute method
 		SendMessage result = feedController.listFeeds(user, chat);
 		
 		// Assertions
 		Mockito.verify(feedService).listFeeds(any(), anyInt(), anyInt()); // feeds are obtained
+		Mockito.verify(messageFactory).createFeedListSendMessage(any(), any(), any());
 		
 		assertNotNull(result); // A message is sent
 		
@@ -107,12 +111,17 @@ class FeedControllerTest {
 		// Prepare POJOs
 		User user = new User(23L);
 		Chat chat = new Chat();
+		SendMessage expected = podamFactory.manufacturePojo(SendMessage.class);
+		
+		// Mocks
+		Mockito.doReturn(expected).when(messageFactory).createFeedListSendMessage(any(), any(), any());
 		
 		// Execute method
 		SendMessage result = feedController.listFeeds(user, chat);
 		
 		// Assertions
 		Mockito.verify(feedService).listFeeds(any(), anyInt(), anyInt()); // feeds are obtained
+		Mockito.verify(messageFactory).createFeedListSendMessage(any(), any(), any());
 		
 		assertNotNull(result); // A message is sent
 		
@@ -124,13 +133,11 @@ class FeedControllerTest {
 		
 		// Prepare POJOs
 		Page<Feed> feedsPage = manufacturePojoPageFeed();
-		Optional<InlineKeyboardMarkup> replyMarkup = Optional.of(new InlineKeyboardMarkup());
 		
 		// Prepare mocks 
-		TelegramRequest request = mockTelegramRequestCallbackQuery();
+		TelegramRequest request = mockTelegramRequestCallbackQuery(true);
 		
 		Mockito.doReturn(feedsPage).when(feedService).listFeeds(any(), anyInt(), anyInt());
-		Mockito.doReturn(replyMarkup).when(replyMarkupFactory).createFeedPage(any(), any());
 		
 		// Execute method
 		feedController.listFeedsCallback(request, FIRST_PAGE, SIZE);
@@ -145,7 +152,7 @@ class FeedControllerTest {
 	void testListFeedsCallbackNoFeeds() {
 		
 		// Prepare mocks 
-		TelegramRequest request = mockTelegramRequestCallbackQuery();
+		TelegramRequest request = mockTelegramRequestCallbackQuery(true);
 	
 		// Execute method
 		feedController.listFeedsCallback(request, FIRST_PAGE, SIZE);
@@ -161,14 +168,11 @@ class FeedControllerTest {
 		// Prepare POJOs
 		String feedId = podamFactory.manufacturePojo(String.class);
 		Optional<Feed> feed = Optional.of(podamFactory.manufacturePojo(Feed.class));
-		InlineKeyboardMarkup replyMarkup = new InlineKeyboardMarkup();
-		
+
 		// Prepare mocks
-		TelegramRequest request = mockTelegramRequestCallbackQuery();
+		TelegramRequest request = mockTelegramRequestCallbackQuery(false);
 		
 		Mockito.doReturn(feed).when(feedService).getFeed(any());
-		Mockito.doReturn(replyMarkup).when(replyMarkupFactory).createItemPage(any(), any(), anyInt(), anyInt());
-		
 		
 		// Execute method
 		feedController.listFeedItems(request, feedId, FIRST_PAGE, SIZE);
@@ -186,7 +190,7 @@ class FeedControllerTest {
 		String feedId = podamFactory.manufacturePojo(String.class);
 		
 		// Prepare mocks
-		TelegramRequest request = mockTelegramRequestCallbackQuery();
+		TelegramRequest request = mockTelegramRequestCallbackQuery(false);
 		
 		// Execute method
 		feedController.listFeedItems(request, feedId, FIRST_PAGE, SIZE);
@@ -200,11 +204,18 @@ class FeedControllerTest {
 	@Test
 	void testAddFeed() {
 		
+		// Prepare Pojo
+		SendMessage expected = podamFactory.manufacturePojo(SendMessage.class);
+		
+		// Prepare mocks
+		Mockito.doReturn(expected).when(messageFactory).createAddFeedSendMessage(any(), any());
+		
 		// Execute method
 		SendMessage result = feedController.addFeed(new User(23L), new Chat());
 		
 		// Assertions
 		assertNotNull(result);
+		Mockito.verify(messageFactory).createAddFeedSendMessage(any(), any());
 		
 	}
 	
@@ -247,7 +258,7 @@ class FeedControllerTest {
 		Optional<Feed> feed = Optional.of(podamFactory.manufacturePojo(Feed.class));
 		
 		// Prepare mocks
-		TelegramRequest request = mockTelegramRequestCallbackQuery();
+		TelegramRequest request = mockTelegramRequestCallbackQuery(false);
 		Mockito.doReturn(feed).when(feedService).getFeed(any());
 		
 		// Execute method
@@ -264,7 +275,7 @@ class FeedControllerTest {
 		String feedId = podamFactory.manufacturePojo(String.class);
 		
 		// Mocks
-		TelegramRequest request = mockTelegramRequestCallbackQuery();
+		TelegramRequest request = mockTelegramRequestCallbackQuery(false);
 		
 		// Execute method
 		feedController.showDeleteFeedDialog(request, feedId);
@@ -282,7 +293,7 @@ class FeedControllerTest {
 		String feedId = podamFactory.manufacturePojo(String.class);
 		
 		// Mocks
-		TelegramRequest request = mockTelegramRequestCallbackQuery();
+		TelegramRequest request = mockTelegramRequestCallbackQuery(false);
 		
 		// Execute method
 		feedController.deleteFeed(request, feedId);
@@ -300,7 +311,7 @@ class FeedControllerTest {
 		Optional<Feed> feed = Optional.of(podamFactory.manufacturePojo(Feed.class));
 		
 		// Mocks
-		TelegramRequest request = mockTelegramRequestCallbackQuery();
+		TelegramRequest request = mockTelegramRequestCallbackQuery(false);
 		Mockito.doReturn(feed).when(feedService).deleteFeed(any());
 		
 		// Execute method
@@ -316,25 +327,27 @@ class FeedControllerTest {
 		return new PageImpl<Feed>(feedList, PageRequest.of(FIRST_PAGE, SIZE), TOTAL_ELEMENTS);
 	}
 	
-	private TelegramRequest mockTelegramRequestCallbackQuery() {
+	private TelegramRequest mockTelegramRequestCallbackQuery(boolean mockUser) {
 		
 		// Mocks
 		TelegramRequest request = Mockito.mock(TelegramRequest.class);
 		TelegramBot bot = Mockito.mock(TelegramBot.class);
 		Update update = Mockito.mock(Update.class);
 		CallbackQuery callbackQuery = Mockito.mock(CallbackQuery.class);
-		Message message = Mockito.mock(Message.class);
+		//Message message = Mockito.mock(Message.class);
 		
 		// Prepare mocks
 		Mockito.doReturn(bot).when(request).getTelegramBot();
-		Mockito.doReturn(new User(23L)).when(request).getUser();
-		Mockito.doReturn(new Chat()).when(request).getChat();
+		if(mockUser) {
+			Mockito.doReturn(new User(23L)).when(request).getUser();
+		}
+		//Mockito.doReturn(new Chat()).when(request).getChat();
 		Mockito.doReturn(update).when(request).getUpdate();
 		
 		// CallbackQuery related mocks
 		Mockito.doReturn(callbackQuery).when(update).callbackQuery();
-		Mockito.doReturn(message).when(callbackQuery).message();
-		Mockito.doReturn(0).when(message).messageId();
+		//Mockito.doReturn(message).when(callbackQuery).message();
+		//Mockito.doReturn(0).when(message).messageId();
 		
 		// Bot execution
 		Mockito.doReturn(null).when(bot).execute(any());
