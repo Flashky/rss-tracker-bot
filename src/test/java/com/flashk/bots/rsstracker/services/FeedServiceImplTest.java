@@ -90,7 +90,6 @@ class FeedServiceImplTest {
 		
 		assertNotNull(result);
 		assertEquals(expected.getTitle(), result.getTitle());
-		assertEquals(expected.getDescription(), result.getDescription());
 		assertEquals(expected.getSourceLink(), result.getSourceLink());
 		
 		
