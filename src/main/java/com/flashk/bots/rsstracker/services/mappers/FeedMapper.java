@@ -10,33 +10,17 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 
 import com.flashk.bots.rsstracker.repositories.entities.FeedEntity;
-import com.flashk.bots.rsstracker.repositories.entities.ItemEntity;
 import com.flashk.bots.rsstracker.services.model.Feed;
 import com.flashk.bots.rsstracker.services.model.Item;
 import com.rometools.rome.feed.synd.SyndEntry;
-import com.rometools.rome.feed.synd.SyndFeed;
 
 @Mapper(componentModel = "spring")
 public abstract class FeedMapper {	
 	
-	// TODO Split mapper in two mappers: FeedEntityMapper and FeedMapper
-	
-	@Mapping(source = "userId", target = "telegram.userId")
-	@Mapping(source = "chatId", target = "telegram.chatId")
-	@Mapping(target = "id", ignore = true)
-	@Mapping(source = "syndFeed.title", target = "title", qualifiedByName = "cleanHtml")
-	@Mapping(target = "isEnabled", ignore = true)
-	@Mapping(target = "createdDate", ignore = true)
-	@Mapping(target = "lastModifiedDate", ignore = true)
-	@Mapping(source = "syndFeed.entries", target = "notifiedItems")
-	public abstract FeedEntity map(Long userId, Long chatId, String sourceLink, SyndFeed syndFeed);
 	public abstract Feed map(FeedEntity feedEntity, List<SyndEntry> items);
 	
 	@Mapping(source = "title", target = "title", qualifiedByName = "cleanHtml")
-	public abstract ItemEntity map(SyndEntry syndEntry);
-	
-	@Mapping(source = "title", target = "title", qualifiedByName = "cleanHtml")
-	public abstract Item syndEntryToItem(SyndEntry syndEntry);
+	public abstract Item map(SyndEntry syndEntry);
 	
 	@Mapping(source = "notifiedItems", target = "items")
 	public abstract Feed map(FeedEntity feedEntity);

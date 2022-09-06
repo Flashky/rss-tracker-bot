@@ -12,6 +12,7 @@ import org.springframework.validation.annotation.Validated;
 
 import com.flashk.bots.rsstracker.repositories.FeedRepository;
 import com.flashk.bots.rsstracker.repositories.entities.FeedEntity;
+import com.flashk.bots.rsstracker.repositories.mappers.FeedEntityMapper;
 import com.flashk.bots.rsstracker.services.mappers.FeedMapper;
 import com.flashk.bots.rsstracker.services.model.Feed;
 import com.flashk.bots.rsstracker.services.util.FeedReader;
@@ -31,6 +32,9 @@ public class FeedServiceImpl implements FeedService {
 	@Autowired
 	private FeedMapper feedMapper;
 	
+	@Autowired
+	private FeedEntityMapper feedEntityMapper;
+	
 	@Override
 	public Feed createFeed(Long userId, Long chatId, String feedUrl) {
 		
@@ -38,7 +42,7 @@ public class FeedServiceImpl implements FeedService {
 		SyndFeed feed = feedReader.read(feedUrl);
 		
 		// Prepare the entity to save
-		FeedEntity feedEntity = feedMapper.map(userId, chatId, feedUrl, feed);
+		FeedEntity feedEntity = feedEntityMapper.map(userId, chatId, feedUrl, feed);
 		
 		// Save entity and return it
 		FeedEntity savedFeedEntity = feedRepository.save(feedEntity);

@@ -27,6 +27,8 @@ import org.springframework.data.domain.Pageable;
 
 import com.flashk.bots.rsstracker.repositories.FeedRepository;
 import com.flashk.bots.rsstracker.repositories.entities.FeedEntity;
+import com.flashk.bots.rsstracker.repositories.mappers.FeedEntityMapper;
+import com.flashk.bots.rsstracker.repositories.mappers.FeedEntityMapperImpl;
 import com.flashk.bots.rsstracker.services.exceptions.InvalidRssException;
 import com.flashk.bots.rsstracker.services.mappers.FeedMapper;
 import com.flashk.bots.rsstracker.services.mappers.FeedMapperImpl;
@@ -57,6 +59,9 @@ class FeedServiceImplTest {
 	
 	@Spy
 	private FeedMapper feedMapper = new FeedMapperImpl();
+	
+	@Spy
+	private FeedEntityMapper feedEntityMapper = new FeedEntityMapperImpl();
 	
 	@Mock
 	private FeedRepository feedRepository;
