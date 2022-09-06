@@ -2,39 +2,31 @@ package com.flashk.bots.rsstracker.services.mappers;
 
 import java.util.List;
 
+import org.jsoup.Jsoup;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.Named;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 
 import com.flashk.bots.rsstracker.repositories.entities.FeedEntity;
 import com.flashk.bots.rsstracker.services.model.Feed;
-import com.rometools.rome.feed.synd.SyndContent;
+import com.flashk.bots.rsstracker.services.model.Item;
 import com.rometools.rome.feed.synd.SyndEntry;
-import com.rometools.rome.feed.synd.SyndFeed;
 
 @Mapper(componentModel = "spring")
 public abstract class FeedMapper {	
 	
-	@Mapping(source = "userId", target = "telegram.userId")
-	@Mapping(source = "chatId", target = "telegram.chatId")
-	@Mapping(target = "id", ignore = true)
-	@Mapping(target = "isEnabled", ignore = true)
-	@Mapping(target = "createdDate", ignore = true)
-	@Mapping(target = "lastModifiedDate", ignore = true)
-	@Mapping(source = "syndFeed.entries", target = "notifiedItems")
-	public abstract FeedEntity map(Long userId, Long chatId, String sourceLink, SyndFeed syndFeed);
 	public abstract Feed map(FeedEntity feedEntity, List<SyndEntry> items);
+	
+	@Mapping(source = "title", target = "title", qualifiedByName = "cleanHtml")
+	public abstract Item map(SyndEntry syndEntry);
 	
 	@Mapping(source = "notifiedItems", target = "items")
 	public abstract Feed map(FeedEntity feedEntity);
 	
 	@Mapping(target = "items", ignore = true)
 	public abstract List<Feed> map(List<FeedEntity> feedEntities);
-	
-    public String map(SyndContent content) {
-        return content.getValue();
-    }
     
 	/**
 	 * Maps a <code>Page&lt;FeedEntity&gt;</code> to a <code>PagedResponse&lt;Feed&gt;</code>.
@@ -56,5 +48,9 @@ public abstract class FeedMapper {
 		return feedPage;
 	}
 
+	@Named("cleanHtml")
+	public String cleanHtml(String html) {
+		return (html == null) ? null : Jsoup.parse(html).text();
+	}
 	
 }

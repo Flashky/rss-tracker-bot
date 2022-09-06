@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.flashk.bots.rsstracker</groupId>
 	<artifactId>rss-tracker-bot</artifactId>
-	<version>0.2.0</version>
+	<version>0.3.0</version>
 	<name>rss-tracker-bot</name>
 	<description>RSS Tracker Bot for Telegram</description>
 	<properties>
@@ -88,6 +88,12 @@
 			<artifactId>emoji-java</artifactId>
 		  <version>5.1.1</version>
 		</dependency>
+		<dependency>
+			<groupId>org.jsoup</groupId>
+			<artifactId>jsoup</artifactId>
+			<version>1.15.3</version>
+		</dependency>
+
 
 		<!--  Testing dependencies -->
 		
