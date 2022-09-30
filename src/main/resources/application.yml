@@ -8,7 +8,7 @@ spring:
   boot:
     admin:
       client:
-        url: http://localhost:9090
+        url: ${ADMIN_SERVER_URL:http://localhost:9090}
         username: ${spring.security.user.name}
         password: ${spring.security.user.password}
         instance:
