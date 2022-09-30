@@ -1,6 +1,19 @@
 spring:
   application:
     name: rss-tracker-bot
+  security:
+    user:
+      name: ${ADMIN_SERVER_USERNAME:admin}
+      password: ${ADMIN_SERVER_PASSWORD:admin} 
+  boot:
+    admin:
+      client:
+        url: http://localhost:9090
+        username: ${spring.security.user.name}
+        password: ${spring.security.user.password}
+        instance:
+          service-host-type: IP
+
   data:
     mongodb:
       authentication-database: admin
@@ -14,3 +27,18 @@ bot:
   token: ${TELEGRAM_BOT_TOKEN}
   feeds: 
     page-size: ${FEEDS_PAGE_SIZE:10}
+
+# Logging configuration
+logging:
+  file:    name: logs/client.log
+  pattern:    file: "%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(%5p) %clr(${PID}){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n%wEx"  logback:    rollingpolicy:      max-file-size: 10MB
+      total-size-cap: 70MB
+      
+# Spring Boot Admin configuration
+management:  endpoints:
+    web:      exposure:        include: health,info,metrics,loggers,logfile,env
+  endpoint:
+    logfile:
+      external-file: logs/client.log
+      
+
