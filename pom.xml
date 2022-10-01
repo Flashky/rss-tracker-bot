@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.flashk.bots.rsstracker</groupId>
 	<artifactId>rss-tracker-bot</artifactId>
-	<version>0.4.0</version>
+	<version>0.5.0-SNAPSHOT</version>
 	<name>rss-tracker-bot</name>
 	<description>RSS Tracker Bot for Telegram</description>
 	<properties>
