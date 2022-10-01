@@ -38,6 +38,8 @@ logging:
 management:  endpoints:
     web:      exposure:        include: health,info,metrics,loggers,logfile,env
   endpoint:
+    health:
+      show-details: ALWAYS
     logfile:
       external-file: logs/client.log
       
