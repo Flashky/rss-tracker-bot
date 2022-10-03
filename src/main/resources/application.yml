@@ -33,9 +33,6 @@ management:  endpoints:
 # Eureka Discovery Client configuration
 eureka:
   instance:
-    #instanceId: ${spring.application.name}
-    app-group-name: rss-tracker-app-group
-    
     preferIpAddress: true
   client:
     serviceUrl:
