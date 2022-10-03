@@ -1,19 +1,6 @@
 spring:
   application:
     name: rss-tracker-bot
-  security:
-    user:
-      name: ${ADMIN_SERVER_USERNAME:admin}
-      password: ${ADMIN_SERVER_PASSWORD:admin} 
-  boot:
-    admin:
-      client:
-        url: ${ADMIN_SERVER_URL:http://localhost:9090}
-        username: ${spring.security.user.name}
-        password: ${spring.security.user.password}
-        instance:
-          service-host-type: IP
-
   data:
     mongodb:
       authentication-database: admin
@@ -42,5 +29,15 @@ management:  endpoints:
       show-details: ALWAYS
     logfile:
       external-file: logs/client.log
-      
+
+# Eureka Discovery Client configuration
+eureka:
+  instance:
+    #instanceId: ${spring.application.name}
+    app-group-name: rss-tracker-app-group
+    
+    preferIpAddress: true
+  client:
+    serviceUrl:
+      defaultZone: http://${EUREKA_SERVER_USERNAME:admin}:${EUREKA_SERVER_PASSWORD:admin}@${EUREKA_SERVER_HOST:localhost}:${EUREKA_SERVER_PORT:8761}/eureka/
 
